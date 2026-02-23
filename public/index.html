@@ -218,7 +218,7 @@
                   <span data-i18n="panel_seismic">פעילות סיסמית</span>
                   <span class="info-icon" onclick="window.seismicApp.showTooltip('seismic')">ⓘ</span>
                 </h2>
-                <span class="panel-weight">משקל: 40%</span>
+                <span class="panel-weight">משקל: 50%</span>
               </div>
                 <div class="panel-score-badge" id="seismic-score">--</div>
               </div>
@@ -358,7 +358,7 @@
                   <span data-i18n="panel_crowd">חוכמת ההמונים</span>
                   <span class="info-icon" onclick="window.seismicApp.showTooltip('crowd')">ⓘ</span>
                 </h2>
-                <span class="panel-weight">משקל: 10%</span>
+                <span class="panel-weight">משקל: 20%</span>
               </div>
                 <div class="panel-score-badge" id="crowd-score">--</div>
               </div>
@@ -405,13 +405,14 @@
           <div class="map-table-grid">
             <!-- Leaflet Map -->
             <div class="map-card">
-              <div class="card-header">
-                <span class="card-icon">🗺️</span>
-                <h2 class="card-title" data-i18n="map_title">מפת אירועים</h2>
-                <span class="map-radius-note" data-i18n="map_radius"
-                  >500 ק"מ מרדיוס</span
-                >
-              </div>
+            <div class="card-header">
+              <span class="card-icon">🗺️</span>
+              <h2 class="card-title">
+                <span data-i18n="map_title">מפת אירועים</span>
+                <span class="info-icon" onclick="window.seismicApp.showTooltip('map')" style="margin-left: 0.5rem">ⓘ</span>
+              </h2>
+              <span class="map-radius-note" data-i18n="map_radius">500 ק"מ רדיוס</span>
+            </div>
               <div
                 id="quake-map"
                 class="quake-map"
@@ -436,13 +437,14 @@
 
             <!-- Recent Quakes Table -->
             <div class="table-card">
-              <div class="card-header">
-                <span class="card-icon">📋</span>
-                <h2 class="card-title" data-i18n="table_title">
-                  רעידות אחרונות
-                </h2>
-                <span class="quake-count-badge" id="quake-count">0</span>
-              </div>
+            <div class="card-header">
+              <span class="card-icon">📋</span>
+              <h2 class="card-title">
+                <span data-i18n="table_title">רעידות אחרונות</span>
+                <span class="info-icon" onclick="window.seismicApp.showTooltip('table')" style="margin-left: 0.5rem">ⓘ</span>
+              </h2>
+              <span class="quake-count-badge" id="quake-count">0</span>
+            </div>
               <div class="table-scroll">
                 <table class="quake-table" aria-label="טבלת רעידות אחרונות">
                   <thead>

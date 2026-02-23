@@ -62,10 +62,11 @@ class SeismicApp {
         },
         lang_toggle: "EN", // switch to EN
         desc: {
-          seismic: "<b>פעילות סיסמית (40%):</b><br>שקלול של רעידות האדמה שהתרחשו ב-48 השעות האחרונות באמצעות מודל ETAS. המודל מזהה 'נחילים' סיסמיים באזור שבר סורי-אפריקאי ומחשב את ההסתברות לרעידת אדמה עוקבת משמעותית.",
-          iono: "<b>יונוספירה וסביבה (30%):</b><br>מחקרים מראים כי לחץ אטמוספרי חריג באגן הים התיכון (IMS) ועיוותים בשכבת היונוספירה באטמוספרה (TEC) הנגרמים מפליטת גזי ראדון מהאדמה (NASA GNSS), עשויים להוות סימנים מקדימים ללחץ טקטוני על השבר.",
-          time: "<b>זמן מהרעידה האחרונה (20%):</b><br>סטטיסטיקת המרווחים. ככל שעובר יותר זמן מהרעידה הגדולה האחרונה על העתקי הים המלח והכרמל (מחזוריות ממוצעת של כ-90-100 שנה לרעידה הרסנית), על פי מודל ה-Gap, סבירות השחרור גדלה.",
-          crowd: "<b>חוכמת ההמונים (10%):</b><br>נתונים מהמרכז הסיסמולוגי האירופי-ים-תיכוני (EMSC). ניתוח של דיווחי אזרחים ('הרגשתי רעידה') שיכולים להעיד על פעילות מקדימה שאינה מזוהה תמיד במכשור בזמן אמת."
+          seismic: "<b>פעילות סיסמית (50%):</b><br>שקלול של רעידות האדמה שהתרחשו ב-48 השעות האחרונות באמצעות מודל ETAS. המודל מזהה 'נחילים' סיסמיים באזור שבר סורי-אפריקאי ומחשב את ההסתברות לרעידת אדמה עוקבת משמעותית.",
+          time: "<b>זמן מהרעידה האחרונה (30%):</b><br>סטטיסטיקת המרווחים. ככל שעובר יותר זמן מהרעידה הגדולה האחרונה על העתקי הים המלח והכרמל (מחזוריות ממוצעת של כ-90-100 שנה לרעידה הרסנית), על פי מודל ה-Gap, סבירות השחרור גדלה.",
+          crowd: "<b>חוכמת ההמונים (20%):</b><br>נתונים מהמרכז הסיסמולוגי האירופי-ים-תיכוני (EMSC). ניתוח של דיווחי אזרחים ('הרגשתי רעידה') שיכולים להעיד על פעילות מקדימה שאינה מזוהה תמיד במכשור בזמן אמת.",
+          map: "<b>מפת אירועים:</b><br>מפה אינטראקטיבית טופוגרפית המציגה את מיקומי כלל הפעילות הסיסמית שהתרחשה לאחרונה בטווח של עד 500 קילומטרים מגבולות ישראל. הצבע וגודל העיגולים משקפים את העוצמה.",
+          table: "<b>רעידות אחרונות:</b><br>רשימה כרונולוגית של האירועים האחרונים כפי שדווחו על ידי הרשתות המקומיות והעולמיות (USGS, EMSC, המכון הגיאולוגי לישראל). הנתונים מתעדכנים אוטומטית בכל דקה."
         }
       },
       en: {
@@ -111,10 +112,11 @@ class SeismicApp {
         },
         lang_toggle: "HE", // switch to HE
         desc: {
-          seismic: "<b>Seismic Activity (40%):</b><br>Aggregation of earthquakes in the last 48 hours using the ETAS model. It detects swarms in the Dead Sea Rift and calculates the probability of a significant aftershock.",
-          iono: "<b>Ionosphere & Environment (30%):</b><br>Anomalies in atmospheric pressure (IMS) and Ionospheric Total Electron Content (NASA GNSS) may indicate tectonic stress buildup due to radon gas emissions.",
-          time: "<b>Time Since Last (20%):</b><br>Statistical gap model. The longer the interval since the last major event on the Dead Sea/Carmel faults, the higher the probability of stress release.",
-          crowd: "<b>Crowd Wisdom (10%):</b><br>Data from the EMSC. Analysis of citizen 'felt' reports which may indicate precursor activity not immediately recognized by instruments."
+          seismic: "<b>Seismic Activity (50%):</b><br>Aggregation of earthquakes in the last 48 hours using the ETAS model. It detects swarms in the Dead Sea Rift and calculates the probability of a significant aftershock.",
+          time: "<b>Time Since Last (30%):</b><br>Statistical gap model. The longer the interval since the last major event on the Dead Sea/Carmel faults, the higher the probability of stress release.",
+          crowd: "<b>Crowd Wisdom (20%):</b><br>Data from the EMSC. Analysis of citizen 'felt' reports which may indicate precursor activity not immediately recognized by instruments.",
+          map: "<b>Events Map:</b><br>An interactive topographic map showing recent seismic activity within a 500km radius of Israel. Circle color and size reflect magnitude.",
+          table: "<b>Recent Earthquakes:</b><br>A chronological list of recent events as reported by local and global networks (USGS, EMSC, GSI). Data refreshes automatically every minute."
         }
       },
     };
@@ -163,44 +165,9 @@ class SeismicApp {
 
   async fetchScore() {
     try {
-      // Use proxy endpoint if available, else mock data for frontend testing
-      // For real implementation:
-      // const res = await fetch(`${API_BASE}/score`);
-      // const data = await res.json();
-
-      // MOCK DATA for layout testing:
-      const data = {
-        totalScore: Math.floor(Math.random() * 20) + 15, // 15-35%
-        components: {
-          seismic: {
-            score: Math.floor(Math.random() * 40),
-            events48h: Math.floor(Math.random() * 15) + 5,
-            baseline: 12.5,
-            etasProb: (Math.random() * 10 + 2).toFixed(1),
-            maxMag: (Math.random() * 2 + 2).toFixed(1),
-          },
-          ionosphere: {
-            score: Math.floor(Math.random() * 30),
-            tec: (Math.random() * 5 + 15).toFixed(1),
-            tecAnomaly: (Math.random() * 4).toFixed(1),
-            pressure: (Math.random() * 20 + 1000).toFixed(1),
-            pressureAnomaly: "רגיל",
-          },
-          time: {
-            score: 18,
-            lastMajorDate: "2018-07-04",
-            dsfActive: "שקט",
-            carmelActive: "שקט",
-          },
-          crowd: {
-            score: Math.floor(Math.random() * 10),
-            felt24h: Math.floor(Math.random() * 50),
-            felt1h: Math.floor(Math.random() * 5),
-            avg: 12,
-          },
-        },
-        timestamp: new Date().toISOString(),
-      };
+      const res = await fetch(`${API_BASE}/score`);
+      if (!res.ok) throw new Error("Network response was not ok");
+      const data = await res.json();
 
       this.state.scoreData = data;
       this.updateDashboard();
@@ -211,62 +178,10 @@ class SeismicApp {
 
   async fetchQuakes() {
     try {
-      // Mock data for quakes
-      const data = {
-        count: 5,
-        features: [
-          {
-            properties: {
-              mag: 2.4,
-              place: "15 km N of Tiberias",
-              time: Date.now() - 3600000,
-              type: "earthquake",
-            },
-            geometry: { coordinates: [35.5, 32.9, 5] },
-            source: "GSI",
-          },
-          {
-            properties: {
-              mag: 3.1,
-              place: "Dead Sea",
-              time: Date.now() - 86400000,
-              type: "earthquake",
-            },
-            geometry: { coordinates: [35.4, 31.5, 12] },
-            source: "GSI",
-          },
-          {
-            properties: {
-              mag: 1.8,
-              place: "Gulf of Aqaba",
-              time: Date.now() - 120000000,
-              type: "earthquake",
-            },
-            geometry: { coordinates: [34.9, 29.3, 8] },
-            source: "USGS",
-          },
-          {
-            properties: {
-              mag: 4.2,
-              place: "Cyprus region",
-              time: Date.now() - 170000000,
-              type: "earthquake",
-            },
-            geometry: { coordinates: [33.0, 34.5, 25] },
-            source: "EMSC",
-          },
-          {
-            properties: {
-              mag: 2.0,
-              place: "Carmel Fault",
-              time: Date.now() - 250000000,
-              type: "earthquake",
-            },
-            geometry: { coordinates: [35.0, 32.7, 10] },
-            source: "GSI",
-          },
-        ],
-      };
+      // Fetch combined/recent quakes from our backend
+      const res = await fetch(`${API_BASE}/quakes`);
+      if (!res.ok) throw new Error("Network response was not ok");
+      const data = await res.json();
 
       this.state.quakesData = data;
       this.updateQuakesTable();
@@ -303,7 +218,6 @@ class SeismicApp {
 
     // 4. Update Panels
     this.updatePanel("seismic", data.totalScore, data.components.seismic);
-    this.updatePanel("ionosphere", data.totalScore, data.components.ionosphere);
     this.updatePanel("time", data.totalScore, data.components.time);
     this.updatePanel("crowd", data.totalScore, data.components.crowd);
   }
@@ -355,24 +269,18 @@ class SeismicApp {
       this.setText("seismic-baseline", compData.baseline);
       this.setText("seismic-etas", `${compData.etasProb}%`);
       this.setText("seismic-maxmag", `M${compData.maxMag}`);
-      this.updateBar("seismic-bar", (compData.score / 40) * 100);
-    } else if (id === 'ionosphere') {
-      this.setText('iono-tec', compData.tec.includes('חסר') ? compData.tec : `${compData.tec} TECU`);
-      this.setText('iono-tec-anomaly', compData.tecAnomaly.includes('חסר') ? compData.tecAnomaly : `+${compData.tecAnomaly}%`);
-      this.setText('iono-pressure', compData.pressure.includes('חסר') ? compData.pressure : `${compData.pressure} hPa`);
-      this.setText('iono-pressure-anomaly', compData.pressureAnomaly);
-      this.updateBar('iono-bar', compData.score === "-" ? 0 : (compData.score / 30) * 100);
+      this.updateBar("seismic-bar", (compData.score / 50) * 100);
     } else if (id === "time") {
       this.setText("time-last-major", compData.lastMajorDate);
       this.setText("time-dsf", compData.dsfActive);
       this.setText("time-carmel", compData.carmelActive);
       // time recurrence is static
-      this.updateBar("time-bar", (compData.score / 20) * 100);
+      this.updateBar("time-bar", (compData.score / 30) * 100);
     } else if (id === "crowd") {
       this.setText("crowd-felt24", compData.felt24h);
       this.setText("crowd-felt1h", compData.felt1h);
       this.setText("crowd-avg", compData.avg);
-      this.updateBar("crowd-bar", (compData.score / 10) * 100);
+      this.updateBar("crowd-bar", (compData.score / 20) * 100);
     }
   }
 

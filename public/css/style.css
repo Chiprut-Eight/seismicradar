@@ -1074,7 +1074,7 @@ body.has-disclaimer .main-content {
 /* Desktop: 1024px+ */
 @media (min-width: 1024px) {
   .panels-grid {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(3, 1fr);
   }
   .main-content {
     padding: 2.5rem 0;
