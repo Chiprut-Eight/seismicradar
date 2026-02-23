@@ -7,7 +7,7 @@ let currentAlertData = null;
 
 // Poll Pikud Haoref API every 2 seconds
 setInterval(() => {
-  pikudHaoref.getActiveAlerts((err, alert) => {
+  pikudHaoref.getActiveAlert((err, alert) => {
     if (err) {
       console.error('[PikudHaoref] Error fetching alerts:', err.message);
       return;
