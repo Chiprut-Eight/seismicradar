@@ -14,7 +14,8 @@ class SeismicModal {
     if (!this.overlay) return;
 
     // Check if previously accepted
-    const isAccepted = localStorage.getItem(this.storageKey);
+    // const isAccepted = localStorage.getItem(this.storageKey);
+    const isAccepted = 'false'; // Forced to always show per user request
 
     if (isAccepted === 'true') {
       // Hide modal, show bar

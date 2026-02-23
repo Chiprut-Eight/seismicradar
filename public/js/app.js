@@ -297,10 +297,10 @@ class SeismicApp {
 
   updatePanel(id, total, compData) {
     const p = document.getElementById(`panel-${id}`);
-    if (!p) return;
+    if (!p || !compData) return;
 
     const scoreBadge = document.getElementById(`${id}-score`);
-    if (scoreBadge) scoreBadge.textContent = compData.score;
+    if (scoreBadge) scoreBadge.textContent = compData.score || "0";
 
     // Update specific metrics based on id
     if (id === "seismic") {
@@ -341,9 +341,9 @@ class SeismicApp {
 
   updateQuakesTable() {
     const data = this.state.quakesData;
-    if (!data) return;
+    if (!data || !data.features) return;
 
-    document.getElementById("quake-count").textContent = data.count;
+    document.getElementById("quake-count").textContent = data.count || data.features.length;
     const tbody = document.getElementById("quake-tbody");
     if (!tbody) return;
 

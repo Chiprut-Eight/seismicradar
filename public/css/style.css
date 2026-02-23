@@ -826,7 +826,6 @@ body.has-disclaimer .main-content {
   grid-template-columns: 1fr;
   gap: 2rem;
   margin-bottom: 2rem;
-  text-align: right;
 }
 .footer-grid h3 {
   color: var(--cyan);
