@@ -1,0 +1,9 @@
+{
+    "mu": 0.005,
+    "K": 0.015,
+    "c": 0.012,
+    "p": 1.12,
+    "alpha": 0.95,
+    "m0": 2.0,
+    "region_label": "Dead Sea Transform / Carmel Fault"
+}

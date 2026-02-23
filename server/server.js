@@ -44,12 +44,14 @@ const emscRoute = require('./routes/emsc');
 const imsRoute = require('./routes/ims');
 const gsiRoute = require('./routes/gsi');
 const nasaRoute = require('./routes/nasa');
+const pikudRoute = require('./routes/pikud');
 
 app.use('/api/usgs', usgsRoute);
 app.use('/api/emsc', emscRoute);
 app.use('/api/ims', imsRoute);
 app.use('/api/gsi', gsiRoute);
 app.use('/api/nasa', nasaRoute);
+app.use('/api/pikud', pikudRoute);
 
 // Default catch-all to index.html for SPA (though this is a static site)
 app.get('*', (req, res) => {

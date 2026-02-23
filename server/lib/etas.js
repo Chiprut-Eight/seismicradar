@@ -3,13 +3,33 @@
  * Calculates probability of a large event based on recent small events (cluster).
  */
 
-const ETAS_PARAMS = {
+const fs = require('fs');
+const path = require('path');
+
+let ETAS_PARAMS = {
   p: 1.1, // Power-law decay exponent (Omori law)
   c: 0.01, // Time offset (prevents singularity at t=0)
   k: 0.02, // Productivity parameter (how many aftershocks an event produces)
   alpha: 0.9, // Magnitude dependence of productivity
   m0: 2.0 // Cutoff magnitude
 };
+
+try {
+  const paramsPath = path.join(__dirname, '../../data/etas_params.json');
+  if (fs.existsSync(paramsPath)) {
+    const data = JSON.parse(fs.readFileSync(paramsPath, 'utf8'));
+    ETAS_PARAMS = {
+      p: data.p || ETAS_PARAMS.p,
+      c: data.c || ETAS_PARAMS.c,
+      k: data.K || ETAS_PARAMS.k, 
+      alpha: data.alpha || ETAS_PARAMS.alpha,
+      m0: data.m0 || ETAS_PARAMS.m0
+    };
+    console.log(`[ETAS] Loaded calibrated parameters for: ${data.region_label || 'Custom'}`);
+  }
+} catch (err) {
+  console.log('[ETAS] Using default parameters (no custom calibration found)');
+}
 
 /**
  * Calculates a relative risk multiplier based on a list of recent events.

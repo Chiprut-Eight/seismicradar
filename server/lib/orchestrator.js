@@ -10,12 +10,13 @@ async function updateSystemData(port) {
     const baseUrl = `http://127.0.0.1:${port}/api`;
     
     // Fetch real data from our proxy routes
-    const [usgsRes, emscRes, gsiRes, nasaRes, imsRes] = await Promise.all([
+    const [usgsRes, emscRes, gsiRes, nasaRes, imsRes, pikudRes] = await Promise.all([
       axios.get(`${baseUrl}/usgs/recent`).catch(() => ({ data: { count: 0, features: [] } })),
       axios.get(`${baseUrl}/emsc/felt`).catch(() => ({ data: { eventsInRegion24h: 0, simulatedFeltReports: 0 } })),
       axios.get(`${baseUrl}/gsi/recent`).catch(() => ({ data: { count: 0, features: [] } })),
       axios.get(`${baseUrl}/nasa/gnss`).catch(() => ({ data: { tec: "--", tecAnomaly: "N/A", pressure: "N/A", pressureAnomaly: "N/A" } })),
-      axios.get(`${baseUrl}/ims/pressure`).catch(() => ({ data: { pressure_hPa: "1012", anomaly: "Normal" } }))
+      axios.get(`${baseUrl}/ims/pressure`).catch(() => ({ data: { pressure_hPa: "1012", anomaly: "Normal" } })),
+      axios.get(`${baseUrl}/pikud/status`).catch(() => ({ data: { activeAlert: false } }))
     ]);
 
     // 1. Combine earthquakes for the table/map
@@ -106,6 +107,18 @@ async function updateSystemData(port) {
 
     // 6. Calculate Risk
     globalScoreCache = calculateWeightedRisk(components);
+
+    // Override if Pikud Haoref alert is active
+    if (pikudRes.data && pikudRes.data.activeAlert) {
+      globalScoreCache.totalScore = 100;
+      globalScoreCache.components.seismic.score = 40;
+      globalScoreCache.components.ionosphere.score = 30;
+      globalScoreCache.components.time.score = 20;
+      globalScoreCache.components.crowd.score = 10;
+      globalScoreCache.isOfficialAlert = true;
+    } else {
+      globalScoreCache.isOfficialAlert = false;
+    }
 
   } catch (error) {
     console.error('[Orchestrator] Error updating system data:', error.message);

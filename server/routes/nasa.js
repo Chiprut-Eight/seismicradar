@@ -1,9 +1,59 @@
 const express = require('express');
 const axios = require('axios');
-
+const zlib = require('zlib');
 const router = express.Router();
 
-// Fetch live Ionospheric Total Electron Content (TEC) data from NASA Earthdata
+// Parse NASA IONEX format to extract TEC at specifically LAT=32.5, LON=35.0 (Israel)
+// IONEX files contain grids with "LAT/LON1/LON2/DLON/H" headers followed by TEC values.
+function extractIsraelTEC(ionexText) {
+  const lines = ionexText.split('\n');
+  let inIsraelLat = false;
+  let tecValue = null;
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    // Look for map block LAT/LON1/LON2/DLON/H
+    // Example:  32.5 -180.0  180.0    5.0  450.0        LAT/LON1/LON2/DLON/H
+    if (line.includes('LAT/LON1/LON2/DLON/H')) {
+      const parts = line.trim().split(/\s+/);
+      const lat = parseFloat(parts[0]);
+      
+      // Check if this latitude block bounds Israel (30.0 to 35.0)
+      if (lat >= 30.0 && lat <= 35.0) {
+        inIsraelLat = true;
+        
+        // The data lines follow. We need longitude around 35.0.
+        // Longitudes usually go from -180 to 180 in steps of 5.
+        // -180 is index 0. So lon 35.0 is index (35 - (-180)) / 5 = 215 / 5 = 43.
+        // The values are printed with 16 per line (format 16I5).
+        // 43 / 16 = 2 (so it's on the 3rd data line under the header), index 43 % 16 = 11.
+        
+        // This is a simplified extraction logic for production.
+        const lonTargetIndex = Math.floor((35.0 - parseFloat(parts[1])) / parseFloat(parts[3]));
+        
+        const lineOffset = Math.floor(lonTargetIndex / 16) + 1; // +1 to skip header
+        const valLine = lines[i + lineOffset];
+        
+        if (valLine) {
+           const valIndex = lonTargetIndex % 16;
+           // each value is 5 chars wide
+           const tecStr = valLine.substring(valIndex * 5, (valIndex * 5) + 5);
+           tecValue = parseInt(tecStr.trim(), 10);
+           // TEC units are often 0.1 TECU according to IONEX standard (EXPONENT is usually -1)
+           // If we find it, break early
+           if (!isNaN(tecValue)) {
+              tecValue = tecValue * 0.1;
+              break;
+           }
+        }
+      } else {
+        inIsraelLat = false;
+      }
+    }
+  }
+  return tecValue;
+}
+
 router.get('/gnss', async (req, res) => {
   try {
     const token = process.env.NASA_API_TOKEN;
@@ -20,12 +70,11 @@ router.get('/gnss', async (req, res) => {
       });
     }
 
-    // Example of authenticating with NASA Earthdata CMR API
-    // We search for recent Global Ionosphere Maps (GIM) granules
+    // 1. Search for recent Global Ionosphere Maps (GIM) granules
     const cmrUrl = 'https://cmr.earthdata.nasa.gov/search/granules.json';
-    const response = await axios.get(cmrUrl, {
+    const cmrResponse = await axios.get(cmrUrl, {
       params: {
-        short_name: 'JPLG0000', // Example JPL GNSS product
+        short_name: 'JPLG0000', // JPL GNSS product
         temporal: `${new Date(Date.now() - 86400000).toISOString()},`,
         page_size: 1
       },
@@ -35,17 +84,58 @@ router.get('/gnss', async (req, res) => {
       timeout: 5000
     });
 
-    // NASA provides raw IONEX or NetCDF granules which require complex decoding
-    // to extract Total Electron Content (TEC) algorithms. 
-    // Since we only want to present REAL data, we will not fabricate pseudo-anomalies.
-    // We confirm connection and auth, but return placeholders.
-    const hasData = response.data.feed.entry.length > 0;
+    const entries = cmrResponse.data.feed.entry || [];
+    const hasData = entries.length > 0;
     
+    let downloadUrl = null;
+    if (hasData) {
+       const links = entries[0].links || [];
+       const dataLink = links.find(l => l.rel === "http://esipfed.org/ns/fedsearch/1.1/data#");
+       if (dataLink) downloadUrl = dataLink.href;
+    }
+
+    let tecVal = "--";
+    let anomalyVal = "--";
+    
+    if (downloadUrl) {
+       try {
+         // 2. Fetch the actual IONEX file (often .gz)
+         const fileRes = await axios.get(downloadUrl, {
+           headers: { 'Authorization': `Bearer ${token}` },
+           responseType: 'arraybuffer',
+           timeout: 10000
+         });
+         
+         // 3. Decompress and Parse
+         let ionexText = "";
+         try {
+           ionexText = zlib.gunzipSync(fileRes.data).toString('utf-8');
+         } catch(e) {
+           // If it's not gzipped (maybe raw or .Z which we can't easily parse in pure JS)
+           ionexText = fileRes.data.toString('utf-8'); 
+         }
+         
+         const extractedTec = extractIsraelTEC(ionexText);
+         if (extractedTec !== null) {
+            tecVal = extractedTec.toFixed(1);
+            // Example baseline logic: 10-20 TECU is normal mid-lat day
+            anomalyVal = (extractedTec > 25.0) ? "High" : "Normal";
+         } else {
+            tecVal = "Format Error";
+         }
+       } catch (err) {
+         console.error('[NASA] File Download/Parse error:', err.message);
+         tecVal = "Auth/Data Error";
+       }
+    } else {
+       tecVal = "No Granule";
+    }
+
     res.json({
       status: "OK",
-      tec: hasData ? "Connected" : "--",
-      tecAnomaly: hasData ? "N/A" : "--",
-      pressure: "N/A", // Pressure is usually handled by IMS
+      tec: tecVal,
+      tecAnomaly: anomalyVal,
+      pressure: "N/A", // Handled by IMS now
       pressureAnomaly: "N/A",
       granuleFound: hasData
     });
