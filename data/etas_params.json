@@ -1,9 +1,9 @@
 {
-    "mu": 0.005,
-    "K": 0.015,
-    "c": 0.012,
-    "p": 1.12,
-    "alpha": 0.95,
+    "mu": 0.013567593771386709,
+    "K": 0.0006183585467190809,
+    "c": 0.2363626610746155,
+    "p": 2.0,
+    "alpha": 3.0,
     "m0": 2.0,
-    "region_label": "Dead Sea Transform / Carmel Fault"
+    "region_label": "Dead Sea Transform / Carmel Fault (V2.0 MLE Calibrated)"
 }
