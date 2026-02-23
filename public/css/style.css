@@ -124,10 +124,7 @@ h2 {
 
 /* ---------- Disclaimer Bar ---------- */
 .disclaimer-bar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
+  position: relative;
   z-index: 1000;
   background: linear-gradient(90deg, #ff1744, #ff6d00);
   color: #fff;
@@ -161,11 +158,6 @@ h2 {
   border-bottom: 1px solid var(--border-glass);
   padding: 0.6rem 0;
   transition: var(--transition);
-}
-/* shift down when disclaimer bar is visible */
-.disclaimer-bar:not(.hidden) ~ .site-header,
-body.has-disclaimer .site-header {
-  top: 2rem;
 }
 
 .header-inner {
