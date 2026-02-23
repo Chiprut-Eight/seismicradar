@@ -1,0 +1,586 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="SeismicRadar – לוח מחוונים לחיזוי הסתברותי של רעידות אדמה בישראל. מבוסס על מודלים סטטיסטיים בלבד."
+    />
+    <title>SeismicRadar – מדד הסיכון הסיסמי לישראל</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&family=Share+Tech+Mono&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    />
+    <link rel="stylesheet" href="/css/style.css" />
+  </head>
+  <body>
+    <!-- ============================================================
+       LEGAL DISCLAIMER MODAL
+  ============================================================ -->
+    <div
+      id="modal-overlay"
+      class="modal-overlay"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modal-title"
+    >
+      <div class="modal-box">
+        <div class="modal-header">
+          <span class="modal-icon">⚠️</span>
+          <h2 id="modal-title">הצהרת אחריות חשובה</h2>
+        </div>
+        <div class="modal-body">
+          <p>
+            <strong>חשוב להבהיר:</strong> אתר זה מבוסס על מודלים
+            מחקריים-סטטיסטיים בלבד ואינו מהווה מערכת התרעה רשמית. המידע המוצג
+            כאן <strong>אינו תחליף ליישומון פיקוד העורף</strong>.
+          </p>
+          <p>
+            פיקוד העורף והרשות החירום הלאומית (רח"ל) הם הגופים המוסמכים היחידים
+            להוציא התרעות רשמיות על רעידות אדמה בישראל.
+          </p>
+          <p>
+            מערכת "תרועה" הלאומית מפעילה צופרים ושולחת התרעות רק כאשר מזוהה
+            רעידה בפועל בעוצמה של <strong>4.5 ומעלה</strong>, מתוך כוונה להתרע
+            רק במקרים של סכנה ממשית לחיי אדם או לתשתיות.
+          </p>
+          <p class="modal-highlight">
+            המשתמש באחוזים המוצגים באתר עושה זאת על
+            <strong>אחריותו הבלעדית בלבד</strong>.
+          </p>
+        </div>
+        <button
+          id="modal-accept"
+          class="modal-btn"
+          onclick="window.seismicModal && window.seismicModal.accept()"
+        >
+          קראתי ומאשר/ת – כניסה לאתר
+        </button>
+      </div>
+    </div>
+
+    <!-- ============================================================
+       DISCLAIMER BAR (shown after modal)
+  ============================================================ -->
+    <div
+      id="disclaimer-bar"
+      class="disclaimer-bar hidden"
+      role="note"
+      aria-label="הצהרת אחריות"
+    >
+      <span class="disclaimer-icon">⚠️</span>
+      <span
+        >אתר זה אינו מערכת התרעה רשמית. למידע רשמי: פיקוד העורף והרח"ל
+        בלבד.</span
+      >
+    </div>
+
+    <!-- ============================================================
+       HEADER
+  ============================================================ -->
+    <header class="site-header" role="banner">
+      <div class="header-inner container">
+        <div class="logo-group">
+          <div class="logo-icon" aria-hidden="true">🌍</div>
+          <div class="logo-text">
+            <span class="logo-main">SeismicRadar</span>
+            <span class="logo-sub">ישראל</span>
+          </div>
+        </div>
+        <nav class="header-nav" aria-label="ניווט ראשי">
+          <div class="live-badge" id="live-badge" aria-live="polite">
+            <span class="live-dot" aria-hidden="true"></span>
+            <span>LIVE</span>
+          </div>
+          <div class="header-clock">
+            <span id="clock-time" class="clock-time" aria-label="שעה נוכחית"
+              >--:--:--</span
+            >
+            <span id="clock-date" class="clock-date">--/--/----</span>
+          </div>
+          <button
+            class="lang-toggle"
+            id="lang-toggle"
+            aria-label="החלף שפה"
+            onclick="window.seismicApp && window.seismicApp.toggleLang()"
+          >
+            EN
+          </button>
+        </nav>
+      </div>
+    </header>
+
+    <!-- ============================================================
+       MAIN CONTENT
+  ============================================================ -->
+    <main class="main-content" role="main">
+      <div class="container">
+        <!-- HERO: Gauge + Score -->
+        <section class="hero-section" aria-labelledby="score-label">
+          <div class="hero-inner">
+            <div
+              class="gauge-wrapper"
+              role="img"
+              aria-label="מד מדד הסיכון הסיסמי"
+            >
+              <svg
+                class="gauge-svg"
+                viewBox="0 0 220 160"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <!-- Background track -->
+                <path
+                  id="gauge-track"
+                  class="gauge-track"
+                  d="M 30 140 A 80 80 0 0 1 190 140"
+                  fill="none"
+                  stroke-width="16"
+                  stroke-linecap="round"
+                />
+                <!-- Colored arc -->
+                <path
+                  id="gauge-arc"
+                  class="gauge-arc"
+                  d="M 30 140 A 80 80 0 0 1 190 140"
+                  fill="none"
+                  stroke-width="16"
+                  stroke-linecap="round"
+                />
+                <!-- Needle -->
+                <line
+                  id="gauge-needle"
+                  class="gauge-needle"
+                  x1="110"
+                  y1="140"
+                  x2="110"
+                  y2="70"
+                  stroke-width="3"
+                  stroke-linecap="round"
+                />
+                <circle cx="110" cy="140" r="6" class="gauge-pivot" />
+                <!-- Labels -->
+                <text x="24" y="158" class="gauge-label-text">0%</text>
+                <text x="170" y="158" class="gauge-label-text">100%</text>
+              </svg>
+
+              <div class="gauge-center">
+                <span class="gauge-value" id="gauge-value" aria-live="polite"
+                  >--</span
+                >
+                <span class="gauge-pct">%</span>
+              </div>
+            </div>
+
+            <div class="score-info">
+              <h1 id="score-label" class="score-title" data-i18n="score_title">
+                מדד הסיכון המשוקלל
+              </h1>
+              <div
+                class="risk-level-badge"
+                id="risk-badge"
+                data-i18n-key="risk_level"
+              >
+                <span id="risk-label" aria-live="polite">טוען...</span>
+              </div>
+              <p class="score-subtitle" data-i18n="score_subtitle">
+                הסתברות להתרחשות רעידת אדמה משמעותית ב-24 השעות הקרובות על בסיס שקלול מידע רב-ממדי
+              </p>
+              <div
+                class="last-update"
+                id="last-update"
+                aria-live="polite"
+                aria-label="עדכון אחרון"
+              >
+                <span class="update-icon">🔄</span>
+                <span data-i18n="last_update">עדכון אחרון:</span>
+                <span id="update-time">--</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 4 DATA VECTOR PANELS -->
+        <section class="panels-section" aria-label="וקטורי מידע">
+          <div class="panels-grid">
+            <!-- Panel 1: Seismic Activity -->
+            <div class="panel" id="panel-seismic" data-weight="40">
+              <div class="panel-header">
+                <span class="panel-icon">📡</span>
+                <div class="panel-title-group">
+                <h2 class="panel-title">
+                  <span data-i18n="panel_seismic">פעילות סיסמית</span>
+                  <span class="info-icon" onclick="window.seismicApp.showTooltip('seismic')">ⓘ</span>
+                </h2>
+                <span class="panel-weight">משקל: 40%</span>
+              </div>
+                <div class="panel-score-badge" id="seismic-score">--</div>
+              </div>
+              <div class="panel-body">
+                <div class="metric-row">
+                  <span class="metric-label" data-i18n="m_events_48h"
+                    >אירועים 48 שעות</span
+                  >
+                  <span class="metric-value" id="seismic-events48">--</span>
+                </div>
+                <div class="metric-row">
+                  <span class="metric-label" data-i18n="m_baseline"
+                    >ממוצע רגיל</span
+                  >
+                  <span class="metric-value" id="seismic-baseline">--</span>
+                </div>
+                <div class="metric-row">
+                  <span class="metric-label" data-i18n="m_etas_prob"
+                    >הסתברות ETAS</span
+                  >
+                  <span class="metric-value highlight" id="seismic-etas"
+                    >--%</span
+                  >
+                </div>
+                <div class="metric-row">
+                  <span class="metric-label" data-i18n="m_max_mag"
+                    >עוצמה מקס'</span
+                  >
+                  <span class="metric-value" id="seismic-maxmag">--</span>
+                </div>
+                <div class="panel-bar-wrap">
+                  <div class="panel-bar" id="seismic-bar">
+                    <div class="panel-bar-fill"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Panel 2: Ionosphere / Environment -->
+            <div class="panel" id="panel-ionosphere" data-weight="30">
+              <div class="panel-header">
+                <span class="panel-icon">🌐</span>
+                <div class="panel-title-group">
+                <h2 class="panel-title">
+                  <span data-i18n="panel_iono">יונוספירה וסביבה</span>
+                  <span class="info-icon" onclick="window.seismicApp.showTooltip('iono')">ⓘ</span>
+                </h2>
+                <span class="panel-weight">משקל: 30%</span>
+              </div>
+                <div class="panel-score-badge" id="iono-score">--</div>
+              </div>
+              <div class="panel-body">
+                <div class="metric-row">
+                  <span class="metric-label" data-i18n="m_tec">TEC (GNSS)</span>
+                  <span class="metric-value" id="iono-tec">-- TECU</span>
+                </div>
+                <div class="metric-row">
+                  <span class="metric-label" data-i18n="m_tec_anomaly"
+                    >חריגת TEC</span
+                  >
+                  <span class="metric-value" id="iono-tec-anomaly">--%</span>
+                </div>
+                <div class="metric-row">
+                  <span class="metric-label" data-i18n="m_pressure"
+                    >לחץ אטמוספרי</span
+                  >
+                  <span class="metric-value" id="iono-pressure">-- hPa</span>
+                </div>
+                <div class="metric-row">
+                  <span class="metric-label" data-i18n="m_pressure_anomaly"
+                    >חריגת לחץ</span
+                  >
+                  <span class="metric-value" id="iono-pressure-anomaly"
+                    >--</span
+                  >
+                </div>
+                <div class="panel-bar-wrap">
+                  <div class="panel-bar" id="iono-bar">
+                    <div class="panel-bar-fill"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Panel 3: Time Since Last -->
+            <div class="panel" id="panel-time" data-weight="20">
+              <div class="panel-header">
+                <span class="panel-icon">⏱️</span>
+                <div class="panel-title-group">
+                <h2 class="panel-title">
+                  <span data-i18n="panel_time">זמן מהרעידה האחרונה</span>
+                  <span class="info-icon" onclick="window.seismicApp.showTooltip('time')">ⓘ</span>
+                </h2>
+                <span class="panel-weight">משקל: 20%</span>
+              </div>
+                <div class="panel-score-badge" id="time-score">--</div>
+              </div>
+              <div class="panel-body">
+                <div class="metric-row">
+                  <span class="metric-label" data-i18n="m_last_major"
+                    >רעידה ≥4.0 אחרונה</span
+                  >
+                  <span class="metric-value" id="time-last-major">--</span>
+                </div>
+                <div class="metric-row">
+                  <span class="metric-label" data-i18n="m_fault"
+                    >עתק ים המלח</span
+                  >
+                  <span class="metric-value" id="time-dsf">--</span>
+                </div>
+                <div class="metric-row">
+                  <span class="metric-label" data-i18n="m_fault_carmel"
+                    >עתק הכרמל</span
+                  >
+                  <span class="metric-value" id="time-carmel">--</span>
+                </div>
+                <div class="metric-row">
+                  <span class="metric-label" data-i18n="m_recurrence"
+                    >מחזוריות ממוצעת</span
+                  >
+                  <span class="metric-value" id="time-recurrence">~18 שנה</span>
+                </div>
+                <div class="panel-bar-wrap">
+                  <div class="panel-bar" id="time-bar">
+                    <div class="panel-bar-fill"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Panel 4: Crowd / EMSC -->
+            <div class="panel" id="panel-crowd" data-weight="10">
+              <div class="panel-header">
+                <span class="panel-icon">🧍</span>
+                <div class="panel-title-group">
+                <h2 class="panel-title">
+                  <span data-i18n="panel_crowd">חוכמת ההמונים</span>
+                  <span class="info-icon" onclick="window.seismicApp.showTooltip('crowd')">ⓘ</span>
+                </h2>
+                <span class="panel-weight">משקל: 10%</span>
+              </div>
+                <div class="panel-score-badge" id="crowd-score">--</div>
+              </div>
+              <div class="panel-body">
+                <div class="metric-row">
+                  <span class="metric-label" data-i18n="m_felt_24h"
+                    >דיווחי "הרגשתי" (24 שעות)</span
+                  >
+                  <span class="metric-value" id="crowd-felt24">--</span>
+                </div>
+                <div class="metric-row">
+                  <span class="metric-label" data-i18n="m_felt_1h"
+                    >דיווחים בשעה האחרונה</span
+                  >
+                  <span class="metric-value highlight" id="crowd-felt1h"
+                    >--</span
+                  >
+                </div>
+                <div class="metric-row">
+                  <span class="metric-label" data-i18n="m_felt_avg"
+                    >ממוצע רגיל (24 שעות)</span
+                  >
+                  <span class="metric-value" id="crowd-avg">--</span>
+                </div>
+                <div class="metric-row">
+                  <span class="metric-label" data-i18n="m_source">מקור</span>
+                  <span class="metric-value">EMSC</span>
+                </div>
+                <div class="panel-bar-wrap">
+                  <div class="panel-bar" id="crowd-bar">
+                    <div class="panel-bar-fill"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- MAP + QUAKE TABLE (side by side on desktop) -->
+        <section
+          class="map-table-section"
+          aria-label="מפה ורשימת רעידות אחרונות"
+        >
+          <div class="map-table-grid">
+            <!-- Leaflet Map -->
+            <div class="map-card">
+              <div class="card-header">
+                <span class="card-icon">🗺️</span>
+                <h2 class="card-title" data-i18n="map_title">מפת אירועים</h2>
+                <span class="map-radius-note" data-i18n="map_radius"
+                  >500 ק"מ מרדיוס</span
+                >
+              </div>
+              <div
+                id="quake-map"
+                class="quake-map"
+                role="img"
+                aria-label="מפת רעידות אדמה"
+              ></div>
+              <div class="map-legend">
+                <span class="legend-item"
+                  ><span class="dot grey"></span> &lt;2.0</span
+                >
+                <span class="legend-item"
+                  ><span class="dot yellow"></span> 2–3</span
+                >
+                <span class="legend-item"
+                  ><span class="dot orange"></span> 3–4</span
+                >
+                <span class="legend-item"
+                  ><span class="dot red"></span> ≥4.0</span
+                >
+              </div>
+            </div>
+
+            <!-- Recent Quakes Table -->
+            <div class="table-card">
+              <div class="card-header">
+                <span class="card-icon">📋</span>
+                <h2 class="card-title" data-i18n="table_title">
+                  רעידות אחרונות
+                </h2>
+                <span class="quake-count-badge" id="quake-count">0</span>
+              </div>
+              <div class="table-scroll">
+                <table class="quake-table" aria-label="טבלת רעידות אחרונות">
+                  <thead>
+                    <tr>
+                      <th data-i18n="th_time">זמן</th>
+                      <th data-i18n="th_mag">עוצמה</th>
+                      <th data-i18n="th_depth">עומק</th>
+                      <th data-i18n="th_location">מיקום</th>
+                      <th data-i18n="th_source">מקור</th>
+                    </tr>
+                  </thead>
+                  <tbody id="quake-tbody">
+                    <tr class="placeholder-row">
+                      <td colspan="5" class="loading-cell">
+                        <div
+                          class="loading-spinner"
+                          aria-label="טוען נתונים..."
+                        ></div>
+                        <span>טוען נתונים...</span>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- DATA SOURCES CREDITS -->
+        <section class="sources-section" aria-label="מקורות מידע">
+          <div class="sources-header">
+            <h2 class="sources-title" data-i18n="sources_title">מקורות מידע</h2>
+          </div>
+          <div class="sources-grid">
+            <a
+              href="https://www.gsi.gov.il"
+              target="_blank"
+              rel="noopener"
+              class="source-chip"
+            >
+              <span>🇮🇱</span> המכון הגיאולוגי לישראל (GSI)
+            </a>
+            <a
+              href="https://earthquake.usgs.gov/fdsnws/event/1/"
+              target="_blank"
+              rel="noopener"
+              class="source-chip"
+            >
+              <span>🇺🇸</span> USGS Earthquake Hazards
+            </a>
+            <a
+              href="https://www.emsc-csem.org/"
+              target="_blank"
+              rel="noopener"
+              class="source-chip"
+            >
+              <span>🌍</span> EMSC Seismic Portal
+            </a>
+            <a
+              href="https://ims.gov.il/"
+              target="_blank"
+              rel="noopener"
+              class="source-chip"
+            >
+              <span>☁️</span> השירות המטאורולוגי (IMS)
+            </a>
+            <a
+              href="https://cddis.nasa.gov/"
+              target="_blank"
+              rel="noopener"
+              class="source-chip"
+            >
+              <span>🛰️</span> NASA CDDIS / GNSS
+            </a>
+          </div>
+        </section>
+      </div>
+      <!-- /container -->
+    </main>
+
+    <!-- ============================================================
+       INFO MODAL (For tooltips)
+  ============================================================ -->
+  <div id="info-modal-overlay" class="modal-overlay hidden" role="dialog" aria-modal="true">
+    <div class="modal-box info-modal-box">
+      <div class="modal-header">
+        <h2 id="info-modal-title">מידע</h2>
+      </div>
+      <div id="info-modal-body" class="modal-body" style="text-align: right; color: var(--text-primary);">
+        <!-- content injected via JS -->
+      </div>
+      <button class="modal-btn" onclick="document.getElementById('info-modal-overlay').classList.add('hidden')">
+        סגור
+      </button>
+    </div>
+  </div>
+
+    <!-- ============================================================
+       FOOTER
+  ============================================================ -->
+    <footer class="site-footer" role="contentinfo">
+      <div class="container">
+        <div class="footer-grid">
+          <div class="footer-legal-full">
+            <h3>המשתמש באחוזים המוצגים באתר עושה זאת על אחריותו הבלעדית בלבד</h3>
+            <p>חשוב להבהיר: אתר זה מבוסס על מודלים מחקריים-סטטיסטיים בלבד ואינו מהווה מערכת התרעה רשמית. המידע המוצג כאן אינו תחליף ליישומון פיקוד העורף. פיקוד העורף והרשות החירום הלאומית (רח"ל) הם הגופים המוסמכים היחידים להוציא התרעות רשמיות על רעידות אדמה בישראל.</p>
+          </div>
+          
+          <div class="footer-apps">
+            <h3>הורד את האפליקציה הרשמית של פיקוד העורף</h3>
+            <div class="app-buttons">
+              <a href="https://play.google.com/store/apps/details?id=com.oref" target="_blank" rel="noopener" class="app-btn android"><span class="app-icon">🤖</span> Google Play</a>
+              <a href="https://apps.apple.com/il/app/%D7%A4%D7%99%D7%A7%D7%95%D7%93-%D7%94%D7%A2%D7%95%D7%A8%D7%A3/id1138249061" target="_blank" rel="noopener" class="app-btn apple"><span class="app-icon">🍏</span> App Store</a>
+            </div>
+          </div>
+          
+          <div class="footer-guidelines">
+            <h3>מה עושים בעת רעידת אדמה?</h3>
+            <ul>
+              <li><strong>בתוך מבנה:</strong> צאו מיד לשטח פתוח. אם לא ניתן, היכנסו לממ"ד והשאירו דלת פתוחה. אם אין ממ"ד, צאו לחדר המדרגות. רק אם אי אפשר לצאת הנה, היכנסו תחת רהיט כבד או שבו צמוד לקיר פנימי.</li>
+              <li><strong>בחוץ:</strong> הישארו בשטח הפתוח, התרחקו ממבנים, עצים וקריסת חשמל.</li>
+              <li><strong>ברכב:</strong> עצרו בצד הדרך וחכו בתוך הרכב עד לסיום הרעידה. התרחקו מגשרים.</li>
+              <li><strong>בחוף הים:</strong> התרחקו קילומטר אחד מחוף הים מתוך חשש לצונאמי.</li>
+            </ul>
+          </div>
+        </div>
+        
+        <p class="footer-version">v1.1.0 | ETAS Model · Omori–Utsu · Dead Sea Rift | מבוסס על OEF</p>
+      </div>
+    </footer>
+
+    <!-- ============================================================
+       SCRIPTS
+  ============================================================ -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="/js/modal.js"></script>
+    <script src="/js/gauge.js"></script>
+    <script src="/js/map.js"></script>
+    <script src="/js/app.js"></script>
+  </body>
+</html>

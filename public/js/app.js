@@ -1,0 +1,499 @@
+/* ============================================================
+   SeismicRadar – app.js
+   Main Orchestrator: Fetches API data, updates DOM, handles i18n
+   ============================================================ */
+
+const API_BASE = "/api";
+const REFRESH_INTERVAL_SCORE = 30000; // 30 sec
+const REFRESH_INTERVAL_QUAKES = 60000; // 60 sec
+
+class SeismicApp {
+  constructor() {
+    this.currentLang = "he";
+    this.state = {
+      scoreData: null,
+      quakesData: null,
+      lastUpdate: null,
+      isPolling: false,
+    };
+
+    // Dictionary for basic static i18n
+    this.i18n = {
+      he: {
+        score_title: "מדד הסיכון המשוקלל",
+        score_subtitle: "הסתברות להתרחשות רעידת אדמה משמעותית ב-24 השעות הקרובות על בסיס שקלול מידע רב-ממדי",
+        last_update: "עדכון אחרון:",
+        panel_seismic: "פעילות סיסמית",
+        panel_iono: "יונוספירה וסביבה",
+        panel_time: "זמן מהרעידה האחרונה",
+        panel_crowd: "חוכמת ההמונים",
+        m_events_48h: "אירועים 48 שעות",
+        m_baseline: "ממוצע רגיל (חודשי)",
+        m_etas_prob: "הסתברות ETAS",
+        m_max_mag: "עוצמה מרבית",
+        m_tec: "TEC (GNSS)",
+        m_tec_anomaly: "חריגת TEC",
+        m_pressure: "לחץ אטמוספרי",
+        m_pressure_anomaly: "חריגת לחץ",
+        m_last_major: "רעידה ≥4.0 אחרונה",
+        m_fault: "העתק ים המלח",
+        m_fault_carmel: "העתק הכרמל",
+        m_recurrence: "מחזוריות ממוצעת",
+        m_felt_24h: 'דיווחי "הרגשתי" (24 ש)',
+        m_felt_1h: "דיווחים בשעה האחרונה",
+        m_felt_avg: "ממוצע רגיל",
+        m_source: "מקור",
+        map_title: "מפת אירועים",
+        map_radius: '500 ק"מ רדיוס',
+        table_title: "רעידות אחרונות",
+        th_time: "זמן",
+        th_mag: "עוצמה",
+        th_depth: 'עומק (ק"מ)',
+        th_location: "מיקום",
+        th_source: "מקור",
+        sources_title: "מקורות נתונים נתמכים API",
+        footer_legal:
+          "© 2026 SeismicRadar | מבוסס על מודלים סטטיסטיים בלבד | אינו מחליף מערכת התרעה רשמית",
+        risk: {
+          low: "נמוך",
+          medium: "בינוני",
+          high: "גבוה חריג",
+          critical: "קריטי",
+        },
+        lang_toggle: "EN", // switch to EN
+        desc: {
+          seismic: "<b>פעילות סיסמית (40%):</b><br>שקלול של רעידות האדמה שהתרחשו ב-48 השעות האחרונות באמצעות מודל ETAS. המודל מזהה 'נחילים' סיסמיים באזור שבר סורי-אפריקאי ומחשב את ההסתברות לרעידת אדמה עוקבת משמעותית.",
+          iono: "<b>יונוספירה וסביבה (30%):</b><br>מחקרים מראים כי לחץ אטמוספרי חריג באגן הים התיכון (IMS) ועיוותים בשכבת היונוספירה באטמוספרה (TEC) הנגרמים מפליטת גזי ראדון מהאדמה (NASA GNSS), עשויים להוות סימנים מקדימים ללחץ טקטוני על השבר.",
+          time: "<b>זמן מהרעידה האחרונה (20%):</b><br>סטטיסטיקת המרווחים. ככל שעובר יותר זמן מהרעידה הגדולה האחרונה על העתקי הים המלח והכרמל (מחזוריות ממוצעת של כ-90-100 שנה לרעידה הרסנית), על פי מודל ה-Gap, סבירות השחרור גדלה.",
+          crowd: "<b>חוכמת ההמונים (10%):</b><br>נתונים מהמרכז הסיסמולוגי האירופי-ים-תיכוני (EMSC). ניתוח של דיווחי אזרחים ('הרגשתי רעידה') שיכולים להעיד על פעילות מקדימה שאינה מזוהה תמיד במכשור בזמן אמת."
+        }
+      },
+      en: {
+        score_title: "Weighted Risk Index",
+        score_subtitle: "Probability of a significant earthquake occurring within the next 24 hours based on multi-dimensional analysis",
+        last_update: "Last updated:",
+        panel_seismic: "Seismic Activity",
+        panel_iono: "Ionosphere & Env",
+        panel_time: "Time Since Last",
+        panel_crowd: "Crowd Wisdom",
+        m_events_48h: "Events (48h)",
+        m_baseline: "Normal Avg (Mo)",
+        m_etas_prob: "ETAS Probability",
+        m_max_mag: "Max Magnitude",
+        m_tec: "TEC (GNSS)",
+        m_tec_anomaly: "TEC Anomaly",
+        m_pressure: "Atmospheric Pres.",
+        m_pressure_anomaly: "Pres. Anomaly",
+        m_last_major: "Last ≥4.0 Event",
+        m_fault: "Dead Sea Fault",
+        m_fault_carmel: "Carmel Fault",
+        m_recurrence: "Avg. Recurrence",
+        m_felt_24h: "Felt Reports (24h)",
+        m_felt_1h: "Reports (Last 1h)",
+        m_felt_avg: "Normal Average",
+        m_source: "Source",
+        map_title: "Event Map",
+        map_radius: "500 km radius",
+        table_title: "Recent Earthquakes",
+        th_time: "Time",
+        th_mag: "Mag",
+        th_depth: "Depth (km)",
+        th_location: "Location",
+        th_source: "Source",
+        sources_title: "API Data Sources",
+        footer_legal:
+          "© 2026 SeismicRadar | Based purely on statistical models | Not an official early warning system",
+        risk: {
+          low: "Low",
+          medium: "Medium",
+          high: "High",
+          critical: "Critical",
+        },
+        lang_toggle: "HE", // switch to HE
+        desc: {
+          seismic: "<b>Seismic Activity (40%):</b><br>Aggregation of earthquakes in the last 48 hours using the ETAS model. It detects swarms in the Dead Sea Rift and calculates the probability of a significant aftershock.",
+          iono: "<b>Ionosphere & Environment (30%):</b><br>Anomalies in atmospheric pressure (IMS) and Ionospheric Total Electron Content (NASA GNSS) may indicate tectonic stress buildup due to radon gas emissions.",
+          time: "<b>Time Since Last (20%):</b><br>Statistical gap model. The longer the interval since the last major event on the Dead Sea/Carmel faults, the higher the probability of stress release.",
+          crowd: "<b>Crowd Wisdom (10%):</b><br>Data from the EMSC. Analysis of citizen 'felt' reports which may indicate precursor activity not immediately recognized by instruments."
+        }
+      },
+    };
+  }
+
+  init() {
+    this.setupClock();
+    this.startPolling();
+    this.applyTranslations();
+  }
+
+  // --- Clock ---
+  setupClock() {
+    const updateClock = () => {
+      const now = new Date();
+      const timeOpts = {
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: false,
+      };
+      const dateOpts = { day: "2-digit", month: "2-digit", year: "numeric" };
+
+      document.getElementById("clock-time").textContent =
+        now.toLocaleTimeString(this.currentLang, timeOpts);
+      document.getElementById("clock-date").textContent =
+        now.toLocaleDateString(this.currentLang, dateOpts);
+    };
+    updateClock();
+    setInterval(updateClock, 1000);
+  }
+
+  // --- Polling & Data Fetching ---
+  async startPolling() {
+    if (this.state.isPolling) return;
+    this.state.isPolling = true;
+
+    // Initial fetch
+    await this.fetchScore();
+    await this.fetchQuakes();
+
+    // Set intervals
+    setInterval(() => this.fetchScore(), REFRESH_INTERVAL_SCORE);
+    setInterval(() => this.fetchQuakes(), REFRESH_INTERVAL_QUAKES);
+  }
+
+  async fetchScore() {
+    try {
+      // Use proxy endpoint if available, else mock data for frontend testing
+      // For real implementation:
+      // const res = await fetch(`${API_BASE}/score`);
+      // const data = await res.json();
+
+      // MOCK DATA for layout testing:
+      const data = {
+        totalScore: Math.floor(Math.random() * 20) + 15, // 15-35%
+        components: {
+          seismic: {
+            score: Math.floor(Math.random() * 40),
+            events48h: Math.floor(Math.random() * 15) + 5,
+            baseline: 12.5,
+            etasProb: (Math.random() * 10 + 2).toFixed(1),
+            maxMag: (Math.random() * 2 + 2).toFixed(1),
+          },
+          ionosphere: {
+            score: Math.floor(Math.random() * 30),
+            tec: (Math.random() * 5 + 15).toFixed(1),
+            tecAnomaly: (Math.random() * 4).toFixed(1),
+            pressure: (Math.random() * 20 + 1000).toFixed(1),
+            pressureAnomaly: "רגיל",
+          },
+          time: {
+            score: 18,
+            lastMajorDate: "2018-07-04",
+            dsfActive: "שקט",
+            carmelActive: "שקט",
+          },
+          crowd: {
+            score: Math.floor(Math.random() * 10),
+            felt24h: Math.floor(Math.random() * 50),
+            felt1h: Math.floor(Math.random() * 5),
+            avg: 12,
+          },
+        },
+        timestamp: new Date().toISOString(),
+      };
+
+      this.state.scoreData = data;
+      this.updateDashboard();
+    } catch (err) {
+      console.error("Failed to fetch score data:", err);
+    }
+  }
+
+  async fetchQuakes() {
+    try {
+      // Mock data for quakes
+      const data = {
+        count: 5,
+        features: [
+          {
+            properties: {
+              mag: 2.4,
+              place: "15 km N of Tiberias",
+              time: Date.now() - 3600000,
+              type: "earthquake",
+            },
+            geometry: { coordinates: [35.5, 32.9, 5] },
+            source: "GSI",
+          },
+          {
+            properties: {
+              mag: 3.1,
+              place: "Dead Sea",
+              time: Date.now() - 86400000,
+              type: "earthquake",
+            },
+            geometry: { coordinates: [35.4, 31.5, 12] },
+            source: "GSI",
+          },
+          {
+            properties: {
+              mag: 1.8,
+              place: "Gulf of Aqaba",
+              time: Date.now() - 120000000,
+              type: "earthquake",
+            },
+            geometry: { coordinates: [34.9, 29.3, 8] },
+            source: "USGS",
+          },
+          {
+            properties: {
+              mag: 4.2,
+              place: "Cyprus region",
+              time: Date.now() - 170000000,
+              type: "earthquake",
+            },
+            geometry: { coordinates: [33.0, 34.5, 25] },
+            source: "EMSC",
+          },
+          {
+            properties: {
+              mag: 2.0,
+              place: "Carmel Fault",
+              time: Date.now() - 250000000,
+              type: "earthquake",
+            },
+            geometry: { coordinates: [35.0, 32.7, 10] },
+            source: "GSI",
+          },
+        ],
+      };
+
+      this.state.quakesData = data;
+      this.updateQuakesTable();
+      if (window.seismicMap) {
+        window.seismicMap.updateMarkers(data.features);
+      }
+    } catch (err) {
+      console.error("Failed to fetch quakes data:", err);
+    }
+  }
+
+  // --- UI Updaters ---
+  updateDashboard() {
+    const data = this.state.scoreData;
+    if (!data) return;
+
+    // 1. Update Gauge
+    if (window.seismicGauge) {
+      window.seismicGauge.setValue(data.totalScore);
+    }
+    const valEl = document.getElementById("gauge-value");
+    if (valEl) valEl.textContent = data.totalScore;
+
+    // 2. Risk Badge
+    this.updateRiskBadge(data.totalScore);
+
+    // 3. Last Update time
+    const t = new Date(data.timestamp);
+    const timeOpts = { hour: "2-digit", minute: "2-digit", second: "2-digit" };
+    document.getElementById("update-time").textContent = t.toLocaleTimeString(
+      this.currentLang,
+      timeOpts,
+    );
+
+    // 4. Update Panels
+    this.updatePanel("seismic", data.totalScore, data.components.seismic);
+    this.updatePanel("ionosphere", data.totalScore, data.components.ionosphere);
+    this.updatePanel("time", data.totalScore, data.components.time);
+    this.updatePanel("crowd", data.totalScore, data.components.crowd);
+  }
+
+  updateRiskBadge(score) {
+    const badge = document.getElementById("risk-badge");
+    const label = document.getElementById("risk-label");
+    if (!badge || !label) return;
+
+    badge.className = "risk-level-badge"; // reset
+
+    let riskKey = "low";
+    if (score >= 80) {
+      riskKey = "critical";
+      badge.classList.add("risk-badge-critical");
+    } else if (score >= 60) {
+      riskKey = "high";
+      badge.classList.add("risk-badge-high");
+    } else if (score >= 35) {
+      riskKey = "medium";
+      badge.classList.add("risk-badge-medium");
+    } else {
+      riskKey = "low";
+      badge.classList.add("risk-badge-low");
+    }
+
+    // save current key for translation toggle
+    badge.setAttribute("data-i18n-key", `risk.${riskKey}`);
+    label.textContent = this.i18n[this.currentLang].risk[riskKey];
+
+    // Toggle gauge pulse animation
+    const wrapper = document.querySelector(".gauge-wrapper");
+    if (wrapper) {
+      if (score >= 60) wrapper.classList.add("pulse");
+      else wrapper.classList.remove("pulse");
+    }
+  }
+
+  updatePanel(id, total, compData) {
+    const p = document.getElementById(`panel-${id}`);
+    if (!p) return;
+
+    const scoreBadge = document.getElementById(`${id}-score`);
+    if (scoreBadge) scoreBadge.textContent = compData.score;
+
+    // Update specific metrics based on id
+    if (id === "seismic") {
+      this.setText("seismic-events48", compData.events48h);
+      this.setText("seismic-baseline", compData.baseline);
+      this.setText("seismic-etas", `${compData.etasProb}%`);
+      this.setText("seismic-maxmag", `M${compData.maxMag}`);
+      this.updateBar("seismic-bar", (compData.score / 40) * 100);
+    } else if (id === 'ionosphere') {
+      this.setText('iono-tec', compData.tec.includes('חסר') ? compData.tec : `${compData.tec} TECU`);
+      this.setText('iono-tec-anomaly', compData.tecAnomaly.includes('חסר') ? compData.tecAnomaly : `+${compData.tecAnomaly}%`);
+      this.setText('iono-pressure', compData.pressure.includes('חסר') ? compData.pressure : `${compData.pressure} hPa`);
+      this.setText('iono-pressure-anomaly', compData.pressureAnomaly);
+      this.updateBar('iono-bar', compData.score === "-" ? 0 : (compData.score / 30) * 100);
+    } else if (id === "time") {
+      this.setText("time-last-major", compData.lastMajorDate);
+      this.setText("time-dsf", compData.dsfActive);
+      this.setText("time-carmel", compData.carmelActive);
+      // time recurrence is static
+      this.updateBar("time-bar", (compData.score / 20) * 100);
+    } else if (id === "crowd") {
+      this.setText("crowd-felt24", compData.felt24h);
+      this.setText("crowd-felt1h", compData.felt1h);
+      this.setText("crowd-avg", compData.avg);
+      this.updateBar("crowd-bar", (compData.score / 10) * 100);
+    }
+  }
+
+  updateBar(barId, pctComplete) {
+    const bar = document.getElementById(barId);
+    if (!bar) return;
+    const fill = bar.querySelector(".panel-bar-fill");
+    if (fill) {
+      const p = Math.min(Math.max(pctComplete, 0), 100);
+      fill.style.width = `${p}%`;
+      // Color gradient transition logic could be added here based on %
+    }
+  }
+
+  updateQuakesTable() {
+    const data = this.state.quakesData;
+    if (!data) return;
+
+    document.getElementById("quake-count").textContent = data.count;
+    const tbody = document.getElementById("quake-tbody");
+    if (!tbody) return;
+
+    tbody.innerHTML = ""; // clear
+
+    if (data.features.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;">אין נתונים</td></tr>`;
+      return;
+    }
+
+    data.features.forEach((f) => {
+      const props = f.properties;
+      const t = new Date(props.time);
+      const magDisplay = props.mag.toFixed(1);
+
+      let magClass = "mag-low";
+      if (props.mag >= 4.0) magClass = "mag-major";
+      else if (props.mag >= 3.0) magClass = "mag-high";
+      else if (props.mag >= 2.0) magClass = "mag-medium";
+
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>
+          <div style="font-size:0.7rem; color: var(--text-muted)">${t.toLocaleDateString(this.currentLang)}</div>
+          <div>${t.toLocaleTimeString(this.currentLang, { hour: "2-digit", minute: "2-digit" })}</div>
+        </td>
+        <td><span class="mag-badge ${magClass}">M${magDisplay}</span></td>
+        <td>${f.geometry.coordinates[2]}</td>
+        <td>${props.place}</td>
+        <td>${f.source || "Generic"}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  setText(id, val) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = val;
+  }
+
+  // --- i18n ---
+  toggleLang() {
+    this.currentLang = this.currentLang === "he" ? "en" : "he";
+    const isRtl = this.currentLang === "he";
+    document.documentElement.lang = this.currentLang;
+    document.documentElement.dir = isRtl ? "rtl" : "ltr";
+    document.body.setAttribute("dir", isRtl ? "rtl" : "ltr");
+
+    document.getElementById("lang-toggle").textContent =
+      this.i18n[this.currentLang].lang_toggle;
+
+    this.applyTranslations();
+
+    // Re-render data dependent on locale
+    this.updateQuakesTable();
+    if (this.state.scoreData) {
+      const riskKeyAttr = document
+        .getElementById("risk-badge")
+        ?.getAttribute("data-i18n-key");
+      if (riskKeyAttr && riskKeyAttr.startsWith("risk.")) {
+        const k = riskKeyAttr.split(".")[1];
+        document.getElementById("risk-label").textContent =
+          this.i18n[this.currentLang].risk[k];
+      }
+    }
+  }
+
+  applyTranslations() {
+    const dict = this.i18n[this.currentLang];
+    document.querySelectorAll("[data-i18n]").forEach((el) => {
+      const key = el.getAttribute("data-i18n");
+      if (dict[key]) {
+        el.textContent = dict[key];
+      }
+    });
+
+    // Special case for logo text offset in LTR
+    const sub = document.querySelector(".logo-sub");
+    if (sub) {
+      sub.textContent = this.currentLang === "he" ? "ישראל" : "ISRAEL";
+    }
+  }
+
+  showTooltip(panelId) {
+    const modal = document.getElementById('info-modal-overlay');
+    const title = document.getElementById('info-modal-title');
+    const body = document.getElementById('info-modal-body');
+    const dict = this.i18n[this.currentLang].desc;
+
+    if (modal && dict[panelId]) {
+      title.textContent = this.currentLang === 'he' ? 'מידע על המדד' : 'Indicator Info';
+      body.innerHTML = dict[panelId];
+      // ensure text direction is correct
+      body.style.direction = this.currentLang === 'he' ? 'rtl' : 'ltr';
+      body.style.textAlign = this.currentLang === 'he' ? 'right' : 'left';
+      modal.classList.remove('hidden');
+    }
+  }
+}
+
+// Bootstrap
+document.addEventListener("DOMContentLoaded", () => {
+  window.seismicApp = new SeismicApp();
+  window.seismicApp.init();
+});

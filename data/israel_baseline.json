@@ -1,0 +1,35 @@
+{
+  "region": "Israel_Dead_Sea_Rift",
+  "monthly_averages": {
+    "mag_0_to_1.9": 45.2,
+    "mag_2.0_to_2.9": 12.5,
+    "mag_3.0_to_3.9": 2.1,
+    "mag_4.0_plus": 0.1
+  },
+  "daily_averages": {
+    "total_events": 2.0,
+    "felt_reports_emsc": 12,
+    "tec_anomaly_variance": 5.0
+  },
+  "last_major_events": {
+    "dead_sea_fault": {
+      "date": "1927-07-11",
+      "magnitude": 6.2,
+      "location": "North Dead Sea"
+    },
+    "carmel_fault": {
+      "date": "1984-08-24",
+      "magnitude": 5.3,
+      "location": "Carmel / Yagur"
+    },
+    "general_israel": {
+      "date": "2018-07-04",
+      "magnitude": 4.1,
+      "location": "Sea of Galilee"
+    }
+  },
+  "recurrence_intervals_years": {
+    "M6_plus": 90,
+    "M5_plus": 18
+  }
+}
