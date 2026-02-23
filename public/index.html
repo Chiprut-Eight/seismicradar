@@ -34,31 +34,33 @@
       <div class="modal-box">
         <div class="modal-header">
           <span class="modal-icon">⚠️</span>
-          <h2 id="modal-title">הצהרת אחריות חשובה</h2>
+          <div>
+            <h2 id="modal-title" data-i18n="modal_title">הצהרת אחריות חשובה</h2>
+            <p id="modal-subtitle" data-i18n="modal_subtitle" style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.2rem; font-weight: 400;">מערכת ניתוח מודלים סיסמיים סטטיסטיים</p>
+          </div>
         </div>
         <div class="modal-body">
           <p>
-            <strong>חשוב להבהיר:</strong> אתר זה מבוסס על מודלים
-            מחקריים-סטטיסטיים בלבד ואינו מהווה מערכת התרעה רשמית. המידע המוצג
-            כאן <strong>אינו תחליף ליישומון פיקוד העורף</strong>.
+            <strong data-i18n="modal_p1">חשוב להבהיר: אתר זה מבוסס על מודלים מחקריים-סטטיסטיים בלבד ואינו מהווה מערכת התרעה רשמית. המידע המוצג כאן אינו תחליף ליישומון פיקוד העורף.</strong>
           </p>
-          <p>
-            פיקוד העורף והרשות החירום הלאומית (רח"ל) הם הגופים המוסמכים היחידים
+          <p data-i18n="modal_p2">
+            פיקוד העורף ורשות החירום הלאומית (רח"ל) הם הגופים המוסמכים היחידים
             להוציא התרעות רשמיות על רעידות אדמה בישראל.
           </p>
-          <p>
+          <p data-i18n="modal_p3">
             מערכת "תרועה" הלאומית מפעילה צופרים ושולחת התרעות רק כאשר מזוהה
-            רעידה בפועל בעוצמה של <strong>4.5 ומעלה</strong>, מתוך כוונה להתרע
+            רעידה בפועל בעוצמה של 4.5 ומעלה, מתוך כוונה להתריע
             רק במקרים של סכנה ממשית לחיי אדם או לתשתיות.
           </p>
-          <p class="modal-highlight">
+          <p class="modal-highlight" data-i18n="modal_p4">
             המשתמש באחוזים המוצגים באתר עושה זאת על
-            <strong>אחריותו הבלעדית בלבד</strong>.
+            אחריותו הבלעדית בלבד.
           </p>
         </div>
         <button
           id="modal-accept"
           class="modal-btn"
+          data-i18n="modal_btn"
           onclick="window.seismicModal && window.seismicModal.accept()"
         >
           קראתי ומאשר/ת – כניסה לאתר
@@ -76,8 +78,8 @@
       aria-label="הצהרת אחריות"
     >
       <span class="disclaimer-icon">⚠️</span>
-      <span
-        >אתר זה אינו מערכת התרעה רשמית. למידע רשמי: פיקוד העורף והרח"ל
+      <span data-i18n="disclaimer_text"
+        >אתר זה אינו מערכת התרעה רשמית. למידע רשמי: פיקוד העורף ורח"ל
         בלבד.</span
       >
     </div>
@@ -492,7 +494,7 @@
       <div id="info-modal-body" class="modal-body" style="text-align: right; color: var(--text-primary);">
         <!-- content injected via JS -->
       </div>
-      <button class="modal-btn" onclick="document.getElementById('info-modal-overlay').classList.add('hidden')">
+      <button class="modal-btn" data-i18n="close" onclick="document.getElementById('info-modal-overlay').classList.add('hidden')">
         סגור
       </button>
     </div>
@@ -505,30 +507,30 @@
       <div class="container">
         <div class="footer-grid">
           <div class="footer-legal-full">
-            <h3>המשתמש באחוזים המוצגים באתר עושה זאת על אחריותו הבלעדית בלבד</h3>
-            <p>חשוב להבהיר: אתר זה מבוסס על מודלים מחקריים-סטטיסטיים בלבד ואינו מהווה מערכת התרעה רשמית. המידע המוצג כאן אינו תחליף ליישומון פיקוד העורף. פיקוד העורף והרשות החירום הלאומית (רח"ל) הם הגופים המוסמכים היחידים להוציא התרעות רשמיות על רעידות אדמה בישראל.</p>
+            <h3 data-i18n="footer_legal_title">המשתמש באחוזים המוצגים באתר עושה זאת על אחריותו הבלעדית בלבד</h3>
+            <p data-i18n="footer_legal_body">חשוב להבהיר: אתר זה מבוסס על מודלים מחקריים-סטטיסטיים בלבד ואינו מהווה מערכת התרעה רשמית. המידע המוצג כאן אינו תחליף ליישומון פיקוד העורף. פיקוד העורף ורשות החירום הלאומית (רח"ל) הם הגופים המוסמכים היחידים להוציא התרעות רשמיות על רעידות אדמה בישראל.</p>
           </div>
           
           <div class="footer-apps">
-            <h3>הורד את האפליקציה הרשמית של פיקוד העורף</h3>
+            <h3 data-i18n="footer_apps_title">הורד את האפליקציה הרשמית של פיקוד העורף</h3>
             <div class="app-buttons">
-              <a href="https://play.google.com/store/apps/details?id=com.oref" target="_blank" rel="noopener" class="app-btn android"><span class="app-icon">🤖</span> Google Play</a>
-              <a href="https://apps.apple.com/il/app/%D7%A4%D7%99%D7%A7%D7%95%D7%93-%D7%94%D7%A2%D7%95%D7%A8%D7%A3/id1138249061" target="_blank" rel="noopener" class="app-btn apple"><span class="app-icon">🍏</span> App Store</a>
+              <a href="https://play.google.com/store/apps/details?id=com.pure.oreo" target="_blank" rel="noopener" class="app-btn android"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" style="margin-left: 0.3rem;"><path d="M3.609 1.814L13.792 12 3.61 22.186a1.981 1.981 0 0 1-.39-.333c-.156-.183-.22-.416-.22-.663V2.81c0-.247.064-.48.22-.662a1.981 1.981 0 0 1 .39-.334zM14.931 10.86L18.412 7.38l3.414 1.974c.954.551.954 1.442 0 1.993l-3.414 1.973-3.481-3.481v.021zM11.411 14.381L4.544 21.248l9.4-5.434-2.533-1.433zM4.544 2.752l6.867 6.867 2.533-1.433-9.4-5.434z"/></svg> Google Play</a>
+              <a href="https://apps.apple.com/il/app/%D7%A4%D7%99%D7%A7%D7%95%D7%93-%D7%94%D7%A2%D7%95%D7%A8%D7%A3/id1138249061" target="_blank" rel="noopener" class="app-btn apple"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" style="margin-left: 0.3rem;"><path d="M16.58 13.924A7.447 7.447 0 0 1 14.15 7.64 7.41 7.41 0 0 0 8.04 10.61 7.375 7.375 0 0 0 10.437 17a7.21 7.21 0 0 0 6.143-3.076zM15.42 6.805a6.834 6.834 0 0 0 1.636-4.805 7.025 7.025 0 0 0-4.636 2.454 6.786 6.786 0 0 0-1.666 4.706 6.944 6.944 0 0 0 4.666-2.355zM20 17.5c-1.4.8-2.6 1.5-3.8 1.5-1.5 0-2.1-.8-4.2-.8s-2.8.8-4.1.8c-1.4 0-2.6-.9-4-2.4C2.3 14.8.8 11.2.8 8c0-3.3 1.8-5 4-5 1.5 0 2.9.9 4.2.9 1.4 0 3-.9 4.7-.9 1.9 0 3.7.8 4.9 2.2-2.1 1.2-3.4 3.4-3.4 5.8 0 2.7 1.8 5 4.3 6.1A12.723 12.723 0 0 1 20 17.5z"/></svg> App Store</a>
             </div>
           </div>
           
           <div class="footer-guidelines">
-            <h3>מה עושים בעת רעידת אדמה?</h3>
+            <h3 data-i18n="footer_guide_title">מה עושים בעת רעידת אדמה?</h3>
             <ul>
-              <li><strong>בתוך מבנה:</strong> צאו מיד לשטח פתוח. אם לא ניתן, היכנסו לממ"ד והשאירו דלת פתוחה. אם אין ממ"ד, צאו לחדר המדרגות. רק אם אי אפשר לצאת הנה, היכנסו תחת רהיט כבד או שבו צמוד לקיר פנימי.</li>
-              <li><strong>בחוץ:</strong> הישארו בשטח הפתוח, התרחקו ממבנים, עצים וקריסת חשמל.</li>
-              <li><strong>ברכב:</strong> עצרו בצד הדרך וחכו בתוך הרכב עד לסיום הרעידה. התרחקו מגשרים.</li>
-              <li><strong>בחוף הים:</strong> התרחקו קילומטר אחד מחוף הים מתוך חשש לצונאמי.</li>
+              <li data-i18n="footer_g1"><strong>בתוך מבנה:</strong> צאו מיד לשטח פתוח. אם לא ניתן, היכנסו לממ"ד והשאירו דלת פתוחה. אם אין ממ"ד, צאו לחדר המדרגות. רק אם אי אפשר לצאת הנה, היכנסו תחת רהיט כבד או שבו צמוד לקיר פנימי.</li>
+              <li data-i18n="footer_g2"><strong>בחוץ:</strong> הישארו בשטח הפתוח, התרחקו ממבנים, עצים וקריסת חשמל.</li>
+              <li data-i18n="footer_g3"><strong>ברכב:</strong> עצרו בצד הדרך וחכו בתוך הרכב עד לסיום הרעידה. התרחקו מגשרים.</li>
+              <li data-i18n="footer_g4"><strong>בחוף הים:</strong> התרחקו קילומטר אחד מחוף הים מתוך חשש לצונאמי.</li>
             </ul>
           </div>
         </div>
         
-        <p class="footer-copyright" style="text-align: center; font-size: 0.75rem; color: var(--text-muted); margin-top: 1.5rem;">נבנה על ידי גל צ'יפרוט ובינה מלאכותית (Gal Chiprut)</p>
+        <p class="footer-copyright" data-i18n="footer_copyright" style="text-align: center; font-size: 0.75rem; color: var(--text-muted); margin-top: 1.5rem;">נבנה על ידי גל צ'יפרוט ובינה מלאכותית (Gal Chiprut)</p>
         <p class="footer-version">v1.1.0 | ETAS Model · Omori–Utsu · Dead Sea Rift | מבוסס על OEF</p>
       </div>
     </footer>
