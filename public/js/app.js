@@ -80,9 +80,10 @@ class SeismicApp {
         },
         lang_toggle: "EN", // switch to EN
         desc: {
-          seismic: "<b>פעילות סיסמית (50%):</b><br>שקלול של רעידות האדמה שהתרחשו ב-48 השעות האחרונות באמצעות מודל ETAS. המודל מזהה 'נחילים' סיסמיים באזור שבר סורי-אפריקאי ומחשב את ההסתברות לרעידת אדמה עוקבת משמעותית.",
-          time: "<b>זמן מהרעידה האחרונה (30%):</b><br>סטטיסטיקת המרווחים. ככל שעובר יותר זמן מהרעידה הגדולה האחרונה על העתקי הים המלח והכרמל (מחזוריות ממוצעת של כ-90-100 שנה לרעידה הרסנית), על פי מודל ה-Gap, סבירות השחרור גדלה.",
-          crowd: "<b>חוכמת ההמונים (20%):</b><br>נתונים מהמרכז הסיסמולוגי האירופי-ים-תיכוני (EMSC). ניתוח של דיווחי אזרחים ('הרגשתי רעידה') שיכולים להעיד על פעילות מקדימה שאינה מזוהה תמיד במכשור בזמן אמת.",
+          seismic: "<b>פעילות סיסמית (40%):</b><br>שקלול של רעידות האדמה שהתרחשו ב-48 השעות האחרונות באמצעות מודל ETAS. המודל מזהה 'נחילים' סיסמיים באזור שבר סורי-אפריקאי ומחשב את ההסתברות לרעידת אדמה עוקבת משמעותית.",
+          iono: "<b>יונוספירה וסביבה (30%):</b><br>חיבור ללווייני נאסא (GNSS). שינויים בריכוז האלקטרונים (TEC) עשויים להעיד על פליטת גזים מהקרקע עקב לחץ טקטוני גובר לפני רעידה.",
+          time: "<b>זמן מהרעידה האחרונה (20%):</b><br>סטטיסטיקת המרווחים. ככל שעובר יותר זמן מהרעידה הגדולה האחרונה על העתקי הים המלח והכרמל, על פי מודל ה-Gap, סבירות השחרור גדלה.",
+          crowd: "<b>חוכמת ההמונים (10%):</b><br>נתונים מהמרכז הסיסמולוגי האירופי-ים-תיכוני (EMSC). ניתוח של דיווחי אזרחים ('הרגשתי רעידה') שיכולים להעיד על פעילות מקדימה.",
           map: "<b>מפת אירועים:</b><br>מפה אינטראקטיבית טופוגרפית המציגה את מיקומי כלל הפעילות הסיסמית שהתרחשה לאחרונה בטווח של עד 500 קילומטרים מגבולות ישראל. הצבע וגודל העיגולים משקפים את העוצמה.",
           table: "<b>רעידות אחרונות:</b><br>רשימה כרונולוגית של האירועים האחרונים כפי שדווחו על ידי הרשתות המקומיות והעולמיות (USGS, EMSC, המכון הגיאולוגי לישראל). הנתונים מתעדכנים אוטומטית בכל דקה."
         }
@@ -148,9 +149,10 @@ class SeismicApp {
         },
         lang_toggle: "HE", // switch to HE
         desc: {
-          seismic: "<b>Seismic Activity (50%):</b><br>Aggregation of earthquakes in the last 48 hours using the ETAS model. It detects swarms in the Dead Sea Rift and calculates the probability of a significant aftershock.",
-          time: "<b>Time Since Last (30%):</b><br>Statistical gap model. The longer the interval since the last major event on the Dead Sea/Carmel faults, the higher the probability of stress release.",
-          crowd: "<b>Crowd Wisdom (20%):</b><br>Data from the EMSC. Analysis of citizen 'felt' reports which may indicate precursor activity not immediately recognized by instruments.",
+          seismic: "<b>Seismic Activity (40%):</b><br>Aggregation of earthquakes in the last 48 hours using the ETAS model. It detects swarms in the Dead Sea Rift and calculates the probability of a significant aftershock.",
+          iono: "<b>Ionosphere & Env (30%):</b><br>NASA GNSS satellite data. Changes in Total Electron Content (TEC) in the ionosphere can indicate gas release from the ground due to tectonic stress prior to an earthquake.",
+          time: "<b>Time Since Last (20%):</b><br>Statistical gap model. The longer the interval since the last major event on the Dead Sea/Carmel faults, the higher the probability of stress release.",
+          crowd: "<b>Crowd Wisdom (10%):</b><br>Data from the EMSC. Analysis of citizen 'felt' reports which may indicate precursor activity not immediately recognized by instruments.",
           map: "<b>Events Map:</b><br>An interactive topographic map showing recent seismic activity within a 500km radius of Israel. Circle color and size reflect magnitude.",
           table: "<b>Recent Earthquakes:</b><br>A chronological list of recent events as reported by local and global networks (USGS, EMSC, GSI). Data refreshes automatically every minute."
         }

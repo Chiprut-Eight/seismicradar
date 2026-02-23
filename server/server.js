@@ -16,54 +16,26 @@ app.use(express.json());
 // Serve static frontend files
 app.use(express.static(path.join(__dirname, '../public')));
 
-// Mock endpoints for testing the frontend while the actual routes are being built
+const { updateSystemData, getScoreCache, getQuakesCache } = require('./lib/orchestrator');
+
+// Start the orchestrator polling
+// Wait a bit until the server fully binds before making internal requests
+setTimeout(() => {
+  updateSystemData(PORT);
+  setInterval(() => updateSystemData(PORT), 2 * 60 * 1000); // every 2 mins
+}, 3000);
+
+// Endpoints serving aggregated real data
 app.get('/api/score', (req, res) => {
-  const mockScore = {
-    totalScore: Math.floor(Math.random() * 20) + 15,
-    components: {
-      seismic: {
-        score: Math.floor(Math.random() * 40),
-        events48h: Math.floor(Math.random() * 15) + 5,
-        baseline: 12.5,
-        etasProb: (Math.random() * 10 + 2).toFixed(1),
-        maxMag: (Math.random() * 2 + 2).toFixed(1)
-      },
-      ionosphere: {
-        score: Math.floor(Math.random() * 30),
-        tec: (12 + Math.random() * 5).toFixed(1) + " TECU",
-        tecAnomaly: Math.floor(Math.random() * 15) + "%",
-        pressure: Math.floor(1010 + Math.random() * 10) + " hPa",
-        pressureAnomaly: "0"
-      },
-      time: {
-        score: 18,
-        lastMajorDate: "2018-07-04",
-        dsfActive: "שקט",
-        carmelActive: "שקט"
-      },
-      crowd: {
-        score: Math.floor(Math.random() * 10),
-        felt24h: Math.floor(Math.random() * 50),
-        felt1h: Math.floor(Math.random() * 5),
-        avg: 12
-      }
-    },
-    timestamp: new Date().toISOString()
-  };
-  res.json(mockScore);
+  const score = getScoreCache();
+  if (!score) return res.status(503).json({ error: "System warming up, please wait." });
+  res.json(score);
 });
 
 app.get('/api/quakes', (req, res) => {
-  res.json({
-    count: 5,
-    features: [
-      { properties: { mag: 2.4, place: "15 km N of Tiberias", time: Date.now() - 3600000, type: "earthquake" }, geometry: { coordinates: [35.5, 32.9, 5] }, source: "GSI" },
-      { properties: { mag: 3.1, place: "Dead Sea", time: Date.now() - 86400000, type: "earthquake" }, geometry: { coordinates: [35.4, 31.5, 12] }, source: "GSI" },
-      { properties: { mag: 1.8, place: "Gulf of Aqaba", time: Date.now() - 120000000, type: "earthquake" }, geometry: { coordinates: [34.9, 29.3, 8] }, source: "USGS" },
-      { properties: { mag: 4.2, place: "Cyprus region", time: Date.now() - 170000000, type: "earthquake" }, geometry: { coordinates: [33.0, 34.5, 25] }, source: "EMSC" },
-      { properties: { mag: 2.0, place: "Carmel Fault", time: Date.now() - 250000000, type: "earthquake" }, geometry: { coordinates: [35.0, 32.7, 10] }, source: "GSI" }
-    ]
-  });
+  const quakes = getQuakesCache();
+  if (!quakes) return res.status(503).json({ error: "System warming up, please wait." });
+  res.json(quakes);
 });
 
 // Routes

@@ -12,10 +12,10 @@ router.get('/gnss', async (req, res) => {
     if (!token) {
       return res.json({
         status: "Missing Token",
-        tec: 15.2,
-        tecAnomaly: 0,
-        pressure: 1013,
-        pressureAnomaly: 0,
+        tec: "--",
+        tecAnomaly: "--",
+        pressure: "N/A",
+        pressureAnomaly: "N/A",
         message: "NASA_API_TOKEN is not configured."
       });
     }
@@ -35,22 +35,19 @@ router.get('/gnss', async (req, res) => {
       timeout: 5000
     });
 
-    // In a full implementation, we would download the IONEX file from the granule URL
-    // and parse the TEC values for the specific coordinate (Israel).
-    // For now, we simulate the parsed values after successful authentication.
-    
-    // Evaluate some pseudo-random but stable anomalies
-    const baseTec = 12.0 + (Math.random() * 5); 
-    const isAnomaly = Math.random() > 0.8;
-    const tecAnomaly = isAnomaly ? Math.floor(Math.random() * 20) + 10 : Math.floor(Math.random() * 5);
+    // NASA provides raw IONEX or NetCDF granules which require complex decoding
+    // to extract Total Electron Content (TEC) algorithms. 
+    // Since we only want to present REAL data, we will not fabricate pseudo-anomalies.
+    // We confirm connection and auth, but return placeholders.
+    const hasData = response.data.feed.entry.length > 0;
     
     res.json({
       status: "OK",
-      tec: parseFloat(baseTec.toFixed(1)),
-      tecAnomaly: tecAnomaly,
-      pressure: 1012 + Math.floor(Math.random() * 5), // Hectopascals
-      pressureAnomaly: Math.floor(Math.random() * 3),
-      granuleFound: response.data.feed.entry.length > 0
+      tec: hasData ? "Connected" : "--",
+      tecAnomaly: hasData ? "N/A" : "--",
+      pressure: "N/A", // Pressure is usually handled by IMS
+      pressureAnomaly: "N/A",
+      granuleFound: hasData
     });
 
   } catch (error) {
