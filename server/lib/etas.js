@@ -62,8 +62,8 @@ function calculateEtasRate(recentEvents, targetTime) {
  */
 function getEtasProbability(rate) {
   // Sigmoid function to map the unbounded rate [0, inf) to [0, 100]
-  // Tuned roughly for the stub values
-  const prob = (1 - Math.exp(-rate * 5)) * 100;
+  // Tuned for real parameters: scaling factor of 0.5 means a rate of 5.0 (huge swarm) = 91%, typical 0.5 rate = 22%
+  const prob = (1 - Math.exp(-rate * 0.5)) * 100;
   return Math.min(Math.max(prob, 0), 100);
 }
 
