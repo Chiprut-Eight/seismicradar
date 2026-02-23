@@ -58,12 +58,8 @@ async function updateSystemData(port) {
     const seismicNormalized = etasProb; // Directly use probability for score weight mapping
 
     // 3. Compute Ionosphere Score 
-    // Since NASA is just placeholder for now, score is 0. 
-    let ionoNormalized = 0;
-    if (nasaRes.data.tec !== "--" && nasaRes.data.tec !== "Connected") {
-       // if we had real numbers we'd scale them
-       ionoNormalized = 50; 
-    }
+    const isNasaMissing = Object.keys(nasaRes.data).length === 0 || nasaRes.data.tec === "--" || nasaRes.data.tec === "No Granule";
+    const ionoNormalized = isNasaMissing ? 0 : 50; // Real parser would use tecAnomaly * factor. Keep at 0 if missing.
 
     // 4. Compute Time Gap Score
     // Static logic for now since Dead Sea recurrence is 90 years
