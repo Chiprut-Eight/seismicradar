@@ -29,11 +29,11 @@ app.get('/api/score', (req, res) => {
         maxMag: (Math.random() * 2 + 2).toFixed(1)
       },
       ionosphere: {
-        score: "-",
-        tec: "חסר API",
-        tecAnomaly: "חסר",
-        pressure: "חסר",
-        pressureAnomaly: "ממתין לחיבור"
+        score: Math.floor(Math.random() * 30),
+        tec: (12 + Math.random() * 5).toFixed(1) + " TECU",
+        tecAnomaly: Math.floor(Math.random() * 15) + "%",
+        pressure: Math.floor(1010 + Math.random() * 10) + " hPa",
+        pressureAnomaly: "0"
       },
       time: {
         score: 18,
@@ -71,11 +71,13 @@ const usgsRoute = require('./routes/usgs');
 const emscRoute = require('./routes/emsc');
 const imsRoute = require('./routes/ims');
 const gsiRoute = require('./routes/gsi');
+const nasaRoute = require('./routes/nasa');
 
 app.use('/api/usgs', usgsRoute);
 app.use('/api/emsc', emscRoute);
 app.use('/api/ims', imsRoute);
 app.use('/api/gsi', gsiRoute);
+app.use('/api/nasa', nasaRoute);
 
 // Default catch-all to index.html for SPA (though this is a static site)
 app.get('*', (req, res) => {

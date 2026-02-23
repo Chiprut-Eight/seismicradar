@@ -254,6 +254,7 @@ class SeismicApp {
 
     // 4. Update Panels
     this.updatePanel("seismic", data.totalScore, data.components.seismic);
+    this.updatePanel("ionosphere", data.totalScore, data.components.ionosphere);
     this.updatePanel("time", data.totalScore, data.components.time);
     this.updatePanel("crowd", data.totalScore, data.components.crowd);
   }
@@ -305,18 +306,23 @@ class SeismicApp {
       this.setText("seismic-baseline", compData.baseline);
       this.setText("seismic-etas", `${compData.etasProb}%`);
       this.setText("seismic-maxmag", `M${compData.maxMag}`);
-      this.updateBar("seismic-bar", (compData.score / 50) * 100);
+      this.updateBar("seismic-bar", (compData.score / 40) * 100);
+    } else if (id === "ionosphere") {
+      this.setText("iono-tec", compData.tec);
+      this.setText("iono-tec-anomaly", compData.tecAnomaly);
+      this.setText("iono-pressure", compData.pressure);
+      this.setText("iono-pressure-anomaly", compData.pressureAnomaly);
+      this.updateBar("iono-bar", (compData.score / 30) * 100);
     } else if (id === "time") {
       this.setText("time-last-major", compData.lastMajorDate);
       this.setText("time-dsf", compData.dsfActive);
       this.setText("time-carmel", compData.carmelActive);
-      // time recurrence is static
-      this.updateBar("time-bar", (compData.score / 30) * 100);
+      this.updateBar("time-bar", (compData.score / 20) * 100);
     } else if (id === "crowd") {
       this.setText("crowd-felt24", compData.felt24h);
       this.setText("crowd-felt1h", compData.felt1h);
       this.setText("crowd-avg", compData.avg);
-      this.updateBar("crowd-bar", (compData.score / 20) * 100);
+      this.updateBar("crowd-bar", (compData.score / 10) * 100);
     }
   }
 

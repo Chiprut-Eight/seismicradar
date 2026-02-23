@@ -220,7 +220,7 @@
                   <span data-i18n="panel_seismic">פעילות סיסמית</span>
                   <span class="info-icon" onclick="window.seismicApp.showTooltip('seismic')">ⓘ</span>
                 </h2>
-                <span class="panel-weight">משקל: 50%</span>
+                <span class="panel-weight">משקל: 40%</span>
               </div>
                 <div class="panel-score-badge" id="seismic-score">--</div>
               </div>
@@ -259,7 +259,43 @@
               </div>
             </div>
 
-
+            <!-- Panel 2: Ionosphere / Environment -->
+            <div class="panel" id="panel-ionosphere" data-weight="30">
+              <div class="panel-header">
+                <span class="panel-icon">🌐</span>
+                <div class="panel-title-group">
+                <h2 class="panel-title">
+                  <span data-i18n="panel_iono">יונוספירה וסביבה</span>
+                  <span class="info-icon" onclick="window.seismicApp.showTooltip('iono')">ⓘ</span>
+                </h2>
+                <span class="panel-weight">משקל: 20%</span>
+              </div>
+                <div class="panel-score-badge" id="iono-score">--</div>
+              </div>
+              <div class="panel-body">
+                <div class="metric-row">
+                  <span class="metric-label" data-i18n="m_tec">TEC (GNSS)</span>
+                  <span class="metric-value" id="iono-tec">-- TECU</span>
+                </div>
+                <div class="metric-row">
+                  <span class="metric-label" data-i18n="m_tec_anomaly">חריגת TEC</span>
+                  <span class="metric-value" id="iono-tec-anomaly">--%</span>
+                </div>
+                <div class="metric-row">
+                  <span class="metric-label" data-i18n="m_pressure">לחץ אטמוספרי</span>
+                  <span class="metric-value" id="iono-pressure">-- hPa</span>
+                </div>
+                <div class="metric-row">
+                  <span class="metric-label" data-i18n="m_pressure_anomaly">חריגת לחץ</span>
+                  <span class="metric-value" id="iono-pressure-anomaly">--</span>
+                </div>
+                <div class="panel-bar-wrap">
+                  <div class="panel-bar" id="iono-bar">
+                    <div class="panel-bar-fill"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
 
             <!-- Panel 3: Time Since Last -->
             <div class="panel" id="panel-time" data-weight="20">
