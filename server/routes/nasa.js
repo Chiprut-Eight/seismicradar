@@ -74,8 +74,8 @@ router.get('/gnss', async (req, res) => {
     const cmrUrl = 'https://cmr.earthdata.nasa.gov/search/granules.json';
     const cmrResponse = await axios.get(cmrUrl, {
       params: {
-        short_name: 'JPLG0000', // JPL GNSS product
-        temporal: `${new Date(Date.now() - 86400000).toISOString()},`,
+        short_name: 'GNSS_IGS_AC_ion_VTEC_comp', // Official IGS Combined GNSS Ionospheric Product
+        sort_key: '-start_date', // Always get the most recent data available, even if delayed
         page_size: 1
       },
       headers: {
