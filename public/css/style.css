@@ -1094,6 +1094,39 @@ body.has-disclaimer .main-content {
   text-align: start;
   align-items: flex-start;
 }
-[dir="ltr"] .metric-value {
+.metric-value {
   text-align: start;
+}
+
+/* ---- Component Additions ---- */
+.mobile-break {
+  display: none;
+}
+@media (max-width: 600px) {
+  .mobile-break {
+    display: block;
+  }
+}
+
+.bmc-button {
+  background: #FFDD00;
+  color: #000000;
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  transition: opacity 0.2s;
+  white-space: nowrap;
+}
+.bmc-button:hover {
+  opacity: 0.8;
+}
+@media (max-width: 768px) {
+  .bmc-button {
+    font-size: 0.65rem;
+    padding: 0.3rem 0.5rem;
+  }
 }

@@ -60,7 +60,7 @@ class SeismicApp {
         modal_p3: "מערכת \"תרועה\" הלאומית מפעילה צופרים ושולחת התרעות רק כאשר מזוהה רעידה בפועל בעוצמה של 4.5 ומעלה, מתוך כוונה להתריע רק במקרים של סכנה ממשית לחיי אדם או לתשתיות.",
         modal_p4: "המשתמש באחוזים המוצגים באתר עושה זאת על אחריותו הבלעדית בלבד.",
         modal_btn: "קראתי ומאשר/ת – כניסה לאתר",
-        disclaimer_text: "אתר זה אינו מערכת התרעה רשמית. למידע רשמי: פיקוד העורף ורח\"ל בלבד.",
+        disclaimer_text: "אתר זה אינו מערכת התרעה רשמית. <br class='mobile-break'>למידע רשמי: פיקוד העורף ורח\"ל בלבד.",
         footer_legal_title: "המשתמש באחוזים המוצגים באתר עושה זאת על אחריותו הבלעדית בלבד",
         footer_legal_body: "חשוב להבהיר: אתר זה מבוסס על מודלים מחקריים-סטטיסטיים בלבד ואינו מהווה מערכת התרעה רשמית. המידע המוצג כאן אינו תחליף ליישומון פיקוד העורף. פיקוד העורף ורשות החירום הלאומית (רח\"ל) הם הגופים המוסמכים היחידים להוציא התרעות רשמיות על רעידות אדמה בישראל.",
         footer_apps_title: "הורד את האפליקציה הרשמית של פיקוד העורף",
@@ -129,7 +129,7 @@ class SeismicApp {
         modal_p3: "The national \"Trua\" system sounds alarms and sends warnings only when an actual earthquake of magnitude 4.5 or higher is detected, intending to warn only in cases of real danger to human life or infrastructure.",
         modal_p4: "Users of the percentages displayed on this site do so entirely at their own risk.",
         modal_btn: "I have read and agree – Enter Site",
-        disclaimer_text: "This site is not an official warning system. For official information: Home Front Command and NEMA only.",
+        disclaimer_text: "This site is not an official warning system. <br class='mobile-break'>For official information: Home Front Command and NEMA only.",
         footer_legal_title: "Users of the percentages displayed do so at their own risk",
         footer_legal_body: "Important: This site is based purely on statistical research models and is not an official early warning system. The information here does not replace the official app. The Home Front Command and NEMA are the only authorized bodies to issue official earthquake warnings.",
         footer_apps_title: "Download the Official Home Front Command App",
@@ -416,7 +416,7 @@ class SeismicApp {
     document.querySelectorAll("[data-i18n]").forEach((el) => {
       const key = el.getAttribute("data-i18n");
       if (dict[key]) {
-        el.textContent = dict[key];
+        el.innerHTML = dict[key];
       }
     });
 
@@ -449,3 +449,20 @@ document.addEventListener("DOMContentLoaded", () => {
   window.seismicApp = new SeismicApp();
   window.seismicApp.init();
 });
+
+// PWA Install Prompt Logic
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+});
+
+window.triggerPwaInstall = () => {
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then((choiceResult) => {
+      console.log('PWA Install choice:', choiceResult.outcome);
+      deferredPrompt = null;
+    });
+  }
+};

@@ -39,6 +39,10 @@ class SeismicModal {
         this.overlay.classList.add('hidden');
         document.body.style.overflow = '';
         this.showFooterBar();
+        // Trigger PWA install
+        if (typeof window.triggerPwaInstall === 'function') {
+          setTimeout(window.triggerPwaInstall, 2500);
+        }
       }, 300);
     }
   }
