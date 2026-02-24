@@ -121,7 +121,7 @@ router.get('/gnss', async (req, res) => {
             // Example baseline logic: 10-20 TECU is normal mid-lat day
             anomalyVal = (extractedTec > 25.0) ? "High" : "Normal";
          } else {
-            tecVal = "Format Error";
+            tecVal = "ללא נתונים כרגע";
          }
        } catch (err) {
          console.error('[NASA] File Download/Parse error:', err.message);
