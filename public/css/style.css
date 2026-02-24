@@ -171,6 +171,7 @@ h2 {
   display: flex;
   align-items: center;
   gap: 0.6rem;
+  order: 1;
 }
 .logo-icon {
   font-size: 1.8rem;
@@ -198,6 +199,7 @@ h2 {
   gap: 1rem;
   flex-wrap: wrap;
   justify-content: flex-end;
+  order: 3;
 }
 
 .live-badge {
@@ -1102,11 +1104,6 @@ body.has-disclaimer .main-content {
 .mobile-break {
   display: none;
 }
-@media (max-width: 600px) {
-  .mobile-break {
-    display: block;
-  }
-}
 
 .bmc-button {
   background: #FFDD00;
@@ -1120,13 +1117,34 @@ body.has-disclaimer .main-content {
   align-items: center;
   transition: opacity 0.2s;
   white-space: nowrap;
+  order: 2;
 }
 .bmc-button:hover {
   opacity: 0.8;
+  color: #000000;
+  text-decoration: none;
 }
+
 @media (max-width: 768px) {
+  .mobile-break {
+    display: block;
+  }
+  .header-inner {
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+  .logo-group {
+    order: 1;
+  }
+  .header-nav {
+    order: 2;
+  }
   .bmc-button {
-    font-size: 0.65rem;
-    padding: 0.3rem 0.5rem;
+    order: 3;
+    width: 100%;
+    justify-content: center;
+    margin-top: 0.5rem;
+    font-size: 0.75rem;
+    padding: 0.4rem 0.5rem;
   }
 }
