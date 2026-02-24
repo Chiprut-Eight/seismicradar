@@ -59,38 +59,7 @@ router.get('/recent', async (req, res) => {
 
     // Fallback if scrape yields 0 results or fails
     if (features.length === 0) {
-      features = [
-        {
-          type: "Feature",
-          properties: {
-            mag: 2.1,
-            place: "15 ק\"מ צפונית לטבריה",
-            time: Date.now() - 3600000,
-            url: "",
-            title: "M 2.1 - 15 km N of Tiberias"
-          },
-          geometry: {
-            type: "Point",
-            coordinates: [35.5, 32.8, 12]
-          },
-          id: "gsi_mock_1"
-        },
-         {
-          type: "Feature",
-          properties: {
-            mag: 3.2,
-            place: "ים המלח",
-            time: Date.now() - 86400000,
-            url: "",
-            title: "M 3.2 - Dead Sea"
-          },
-          geometry: {
-            type: "Point",
-            coordinates: [35.4, 31.5, 8]
-          },
-          id: "gsi_mock_2"
-        }
-      ];
+      // Do nothing, just return empty list. No more hardcoded fake Tiberias/Dead Sea data.
     }
 
     res.json({
