@@ -38,11 +38,11 @@ function extractIsraelTEC(ionexText) {
            const valIndex = lonTargetIndex % 16;
            // each value is 5 chars wide
            const tecStr = valLine.substring(valIndex * 5, (valIndex * 5) + 5);
-           tecValue = parseInt(tecStr.trim(), 10);
+           const parsed = parseInt(tecStr.trim(), 10);
            // TEC units are often 0.1 TECU according to IONEX standard (EXPONENT is usually -1)
            // If we find it, break early
-           if (!isNaN(tecValue)) {
-              tecValue = tecValue * 0.1;
+           if (!isNaN(parsed)) {
+              tecValue = parsed * 0.1;
               break;
            }
         }

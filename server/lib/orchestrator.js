@@ -58,7 +58,7 @@ async function updateSystemData(port) {
     const seismicNormalized = etasProb; // Directly use probability for score weight mapping
 
     // 3. Compute Ionosphere Score 
-    const isNasaMissing = Object.keys(nasaRes.data).length === 0 || nasaRes.data.tec === "--" || nasaRes.data.tec === "No Granule";
+    const isNasaMissing = Object.keys(nasaRes.data).length === 0 || nasaRes.data.tec === "--" || nasaRes.data.tec === "No Granule" || nasaRes.data.tec === "NaN";
     const ionoNormalized = isNasaMissing ? 0 : 50; // Real parser would use tecAnomaly * factor. Keep at 0 if missing.
 
     // 4. Compute Time Gap Score
