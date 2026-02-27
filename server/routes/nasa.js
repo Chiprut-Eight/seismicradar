@@ -123,9 +123,9 @@ router.get('/gnss', async (req, res) => {
          } else {
             tecVal = "ללא נתונים כרגע";
          }
-       } catch (err) {
+         } catch (err) {
          console.error('[NASA] File Download/Parse error:', err.message);
-         tecVal = "Auth/Data Error";
+         tecVal = "ללא נתונים כרגע";
        }
     } else {
        tecVal = "No Granule";
